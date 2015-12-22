@@ -13,7 +13,7 @@ resource "aws_instance" "core" {
   # Launch the instance
   ami = "${lookup(var.amazon_images, var.region)}"
   instance_type = "${lookup(var.aws_instance_type, "core")}"
-  key_name = "${lookup(var.core, "ssh_key_name")}"
+  key_name = "${var.ssh_key_name}"
   # Give a name to the node
   tags { Name = "${var.cluster_name}-core-${format("%03d", count.index + 1)}" }
   # The VPC Subnet ID to launch in and security group
@@ -33,7 +33,7 @@ resource "aws_instance" "dea" {
   # Launch the instance
   ami = "${lookup(var.amazon_images, var.region)}"
   instance_type = "${lookup(var.aws_instance_type, "dea")}"
-  key_name = "${lookup(var.dea, "ssh_key_name")}"
+  key_name = "${var.ssh_key_name}"
   # Give a name to the node
   tags { Name = "${var.cluster_name}-dea-${format("%03d", count.index + 1)}" }
   # The VPC Subnet ID to launch in
@@ -41,4 +41,23 @@ resource "aws_instance" "dea" {
   vpc_security_group_ids = [ "${aws_security_group.stackato_backend.id}" ]
   # Provision the node
   user_data = "${template_file.dea.rendered}"
+}
+
+resource "aws_instance" "dataservices" {
+  # Launch the instance after the VPC and the Core node
+  depends_on = [ "aws_internet_gateway.gw", "aws_vpc.main", "aws_subnet.private",
+    "aws_instance.core" ]
+  # Amount of nodes
+  count = "${lookup(var.dataservices, "count")}"
+  # Launch the instance
+  ami = "${lookup(var.amazon_images, var.region)}"
+  instance_type = "${lookup(var.aws_instance_type, "dataservices")}"
+  key_name = "${var.ssh_key_name}"
+  # Give a name to the node
+  tags { Name = "${var.cluster_name}-dataservices-${format("%03d", count.index + 1)}" }
+  # The VPC Subnet ID to launch in
+  subnet_id = "${aws_subnet.private.id}"
+  vpc_security_group_ids = [ "${aws_security_group.stackato_backend.id}" ]
+  # Provision the node
+  user_data = "${template_file.dataservices.rendered}"
 }

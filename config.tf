@@ -31,24 +31,39 @@ variable provisioner_bin_url {
   default = "https://www.dropbox.com/s/eu29x762ao7o43x/stackato-provisioner"
 }
 
+variable wait_core_timeout {
+  description = "Timeout in seconds used by nodes to wait for the core node"
+  default = 600
+}
+
+variable core_password { # could use a random password when Terraform support it
+  description = "Password of the core node"
+  default = "stackato"
+}
+
 variable core {
   description = "Configuration of the Core node"
   default = {
     "count" = 1
     "roles" = "core"
     "visibility" = "public"
-    "ssh_key_name" = "stefan-win-key"
-    "passwordlesssudo" = "true"
   }
 }
 
 variable dea {
   description = "Configuration of the DEA nodes"
   default = {
-    "count" = 2
+    "count" = 1
     "roles" = "dea"
     "visibility" = "private"
-    "ssh_key_name" = "stefan-win-key"
-    "passwordlesssudo" = "true"
+  }
+}
+
+variable dataservices {
+  description = "Configuration of the Dataservices nodes"
+  default = {
+    "count" = 1
+    "roles" = "data-services"
+    "visibility" = "private"
   }
 }

@@ -4,7 +4,7 @@
 # Create the VPC
 resource "aws_vpc" "main" {
   cidr_block = "10.0.0.0/16"
-  tags { Name = "vpc-${var.cluster_name}" }
+  tags { Name = "${var.cluster_name}" }
 }
 
 # Attach an internet gateway to the VPC

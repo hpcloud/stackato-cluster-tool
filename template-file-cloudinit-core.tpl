@@ -1,7 +1,7 @@
 #cloud-config
 users:
    - name: stackato
-     sudo: ALL=(ALL) NOPASSWD:ALL
+     sudo: ['ALL=(ALL) NOPASSWD:ALL']
 
 bootcmd:
  # Increase the Redis start script timeout
@@ -17,7 +17,9 @@ runcmd:
  # Update the password of the stackato account
  - echo stackato:${core_password} | chpasswd
  # Disable SSH password authentication on the core
- - sed -i 's/PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
+ # /!\ Don't do that! otherwise node will not be able to transfer SSH keys
+ # - sed -i 's/PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
+ # - service ssh reload
  # Disable SSH StrictHostKeyChecking (otherwise SSH will prompt for the check)
  - su - stackato -c 'echo -e "Host 10.0.*.*\n\tStrictHostKeyChecking no" > /home/stackato/.ssh/config'
  # Setup the core node

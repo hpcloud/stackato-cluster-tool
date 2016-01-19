@@ -13,4 +13,10 @@ variable "amazon_images" {
   }
 }
 
-# Azure:
+variable "openstack_images" {
+  description = "OpenStack images of Stackato 3.4.2"
+  default = {
+    region-a-geo-1 = "a3fde4e8-3f8e-4077-9f35-647c06ba2470" # US West
+    region-b-geo-1 = "f2f83e48-6c52-4734-91ba-d515b77a4b98" # US East
+  }
+}

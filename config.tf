@@ -67,3 +67,9 @@ variable dataservices {
     "visibility" = "private"
   }
 }
+
+# Ephemeral port range of Stackato for the Ingress traffic
+# See file /proc/sys/net/ipv4/ip_local_port_range
+# Using 65535 to support different version of Stackato based OS
+variable ephemeral_port_from { default = 41000 }
+variable ephemeral_port_to   { default = 65535 }

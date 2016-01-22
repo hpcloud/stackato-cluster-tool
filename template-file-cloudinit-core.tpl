@@ -1,19 +1,21 @@
 #cloud-config
-users:
-   - name: stackato
-     sudo: ['ALL=(ALL) NOPASSWD:ALL']
+
+# Does not work
+# users:
+#  - name: stackato
+#    sudo: ['ALL=(ALL) NOPASSWD:ALL']
 
 bootcmd:
- # Increase the Redis start script timeout
- - sed -i "s/timeout 90/timeout 300/" /home/stackato/stackato/etc/firstboot/tasks/05-wait-for-config-redis.sh
+  # Increase the Redis start script timeout
+  - sed -i "s/timeout 90/timeout 300/" /home/stackato/stackato/etc/firstboot/tasks/05-wait-for-config-redis.sh
+  # Passwordless sudo before the Stackato firstboot
+  - echo "stackato ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
 runcmd:
  # Start the APT Cacher
  # Logs: docker exec -it apt-cacher-ng tail -f /var/log/apt-cacher-ng/apt-cacher.log
  #- docker run --name apt-cacher-ng -d --publish 3142:3142 --volume /srv/docker/apt-cacher-ng:/var/cache/apt-cacher-ng quay.io/sameersbn/apt-cacher-ng
  - service apt-cacher-ng start
- # Passwordless sudo
- - echo "stackato ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
  # Update the password of the stackato account
  - echo stackato:${core_password} | chpasswd
  # Disable SSH password authentication on the core

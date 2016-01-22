@@ -1,7 +1,9 @@
 #cloud-config
-users:
-   - name: stackato
-     sudo: ['ALL=(ALL) NOPASSWD:ALL']
+
+# Does not work
+# users:
+#  - name: stackato
+#    sudo: ['ALL=(ALL) NOPASSWD:ALL']
 
 apt_proxy: http://${core_ip}:3142
 packages:
@@ -12,6 +14,8 @@ bootcmd:
  - bash -c 'while ! nc -z ${core_ip} 3142; do echo Waiting for APT Cacher on ${core_ip}; sleep 5; done'
  # Wait for the core node
  - bash -c 'while ! nc -z ${core_ip} 4222; do echo Waiting for core node on ${core_ip}; sleep 5; done'
+ # Passwordless sudo before the Stackato firstboot
+ - echo "stackato ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
 # stackato:
 #   nats:
@@ -21,8 +25,6 @@ bootcmd:
 runcmd:
  # Increase the Redis start script timeout
  - sed -i "s/timeout 90/timeout 300/" /home/stackato/stackato/etc/firstboot/tasks/05-wait-for-config-redis.sh
- # Passwordless sudo
- - echo "stackato ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
  # Disable SSH password authentication on the node
  - sed -i 's/PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
  - service ssh reload

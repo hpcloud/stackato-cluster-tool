@@ -1,5 +1,8 @@
 #cloud-config
 
+packages:
+ - dos2unix
+
 # Does not work
 # users:
 #  - name: stackato
@@ -12,18 +15,7 @@ bootcmd:
   - echo "stackato ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
 runcmd:
- # Start the APT Cacher
- # Logs: docker exec -it apt-cacher-ng tail -f /var/log/apt-cacher-ng/apt-cacher.log
- #- docker run --name apt-cacher-ng -d --publish 3142:3142 --volume /srv/docker/apt-cacher-ng:/var/cache/apt-cacher-ng quay.io/sameersbn/apt-cacher-ng
- - service apt-cacher-ng start
- # Update the password of the stackato account
- - echo stackato:${core_password} | chpasswd
- # Disable SSH password authentication on the core
- # /!\ Don't do that! otherwise node will not be able to transfer SSH keys
- # - sed -i 's/PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
- # - service ssh reload
- # Disable SSH StrictHostKeyChecking (otherwise SSH will prompt for the check)
- - su - stackato -c 'echo -e "Host 10.0.*.*\n\tStrictHostKeyChecking no" > /home/stackato/.ssh/config'
- # Setup the core node
- - su - stackato -c '/home/stackato/bin/kato op defer "node rename ${cluster_hostname} --no-restart" --run-as-root --post-start'
- - su - stackato -c '/home/stackato/bin/kato op defer "node setup core api.${cluster_hostname}" --run-as-root --post-start'
+ - while [ ! -d ${stackato_automation_path} ]; do echo "Waiting for ${stackato_automation_path}"; sleep 5; done
+ - find ${stackato_automation_path} -type f -exec dos2unix {} \;
+ - chmod u+x ${stackato_automation_path}/configure-core.sh
+ - ${stackato_automation_path}/configure-core.sh ${core_password} ${cluster_hostname} ${stackato_automation_path}

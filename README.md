@@ -4,17 +4,33 @@ Terraform a Stackato cluster on Amazon AWS (later Virtualbox).
 ##### 1. Install Terraform
 https://terraform.io/downloads.html
 
-##### 2. Setup your Stackato cluster
+##### 2. Setup your Stackato cluster with make.sh
+
+Print the help of make.sh:
+- On Linux: ./make.sh --help
+- On Windows: bash -c "./make.sh --help"
+
+
 - Choose the Stackato version to deploy by copying stackato-version/var-stackato-xxx.tf into the root folder (folder containing config.tf)
 - Choose your cluster configuration in config.tf. The name of the cluster (key cluster_name) will be asked while launching Terraform
 
 ###### For an Amazon cluster
-- Copy the content of the `amazon-aws` directory into the root directory of the project
+Create the basic configuration:
+```
+make.sh -p amazon-aws
+cd out
+```
+
 - Choose your Amazon configuration in config-amazon.tf, especially aws_access_key and aws_secret_key. Check the Amazon documentation http://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSGettingStartedGuide/AWSCredentials.html to get those two keys.
 - Make sure you uploaded your public SSH key (see doc: http://docs.aws.amazon.com/gettingstarted/latest/wah/getting-started-prereq.html#create-a-key-pair) and update the variable `ssh_key_name` in config-amazon.tf
 
 ###### For an OpenStack cluster
-- Copy the content of the `openstack` directory into the root directory of the project
+Create the basic configuration:
+```
+make.sh -p openstack
+cd out
+```
+
 - Choose your OpenStack configuration in config-openstack.tf
 - Make sure you uploaded your public SSH key (see doc: http://docs.openstack.org/user-guide/configure_access_and_security_for_instances.html#import-a-key-pair) and update the variable `ssh_key_name` in config-amazon.tf
 

@@ -71,6 +71,7 @@ function copy_terraform_config() {
   local output_dir="$3"
   local platform_dir="$CWD/$platform"
   local version_dir="$CWD/$version"
+  local provisioner_dir="$CWD/stackato-automation"
 
   if [ ! -d "$platform_dir" ]; then
     message "error" "$MSG_PLATFORM_DIR_NOT_FOUND" "$platform_dir"
@@ -80,6 +81,7 @@ function copy_terraform_config() {
     find $CWD -maxdepth 1 -type f \( -name "*.tf" -or -name "*.tpl" \) -exec cp {} $output_dir \;
     cp $platform_dir/* $output_dir
     cp $version_dir $output_dir
+    cp -r $provisioner_dir $output_dir
     message "info" "$MSG_TERRAFORM_CONFIG_COPY_DONE" "$version" "$platform"
     message "stdout" "$output_dir"
   fi

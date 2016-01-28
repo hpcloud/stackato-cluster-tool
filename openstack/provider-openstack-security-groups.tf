@@ -26,6 +26,12 @@ resource "openstack_compute_secgroup_v2" "public" {
     ip_protocol = "tcp"
     cidr = "0.0.0.0/0"
   }
+  rule {
+    from_port = -1
+    to_port = -1
+    ip_protocol = "icmp"
+    cidr = "0.0.0.0/0"
+  }
 
   # Intranet
   rule {

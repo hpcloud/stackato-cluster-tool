@@ -5,6 +5,7 @@ resource "template_file" "core" {
   vars {
       cluster_hostname = "${var.cluster_hostname}"
       core_password = "${var.core_password}"
+      stackato_automation_path = "${var.stackato_automation_path}"
   }
 }
 

@@ -18,6 +18,18 @@ resource "openstack_compute_instance_v2" "core" {
   floating_ip = "${openstack_compute_floatingip_v2.floatips.address}"
   scheduler_hints { build_near_host_ip="${openstack_networking_subnet_v2.public.cidr}" }
   user_data = "${template_file.core.rendered}"
+
+  # Setup the provisioner connection with the Core node
+  connection {
+      user = "stackato"
+      password = "${var.core_password}"
+  }
+
+  # Copies the myapp.conf file to /etc/myapp.conf
+  provisioner "file" {
+    source = "stackato-automation"
+    destination = "/opt/"
+  }
 }
 
 resource "openstack_compute_instance_v2" "dea" {

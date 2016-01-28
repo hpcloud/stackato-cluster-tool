@@ -22,6 +22,18 @@ resource "aws_instance" "core" {
   # Provision the node
   # user_data = "PROVISIONER_BIN_URL=${var.provisioner_bin_url}; ROLES=${lookup(var.core, "roles")}; HOSTNAME=${var.cluster_hostname}; PASSWORDLESSSUDO=${lookup(var.core, "passwordlesssudo")}; ${file("provisioner-cloudinit")}"
   user_data = "${template_file.core.rendered}"
+
+  # Setup the provisioner connection with the Core node
+  connection {
+      user = "stackato"
+      password = "${var.core_password}"
+  }
+
+  # Copies the myapp.conf file to /etc/myapp.conf
+  provisioner "file" {
+    source = "stackato-automation"
+    destination = "/opt/"
+  }
 }
 
 resource "aws_instance" "dea" {

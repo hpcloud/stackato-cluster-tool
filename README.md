@@ -1,5 +1,5 @@
 # stackato-cluster-tool
-Terraform a Stackato cluster on Amazon AWS (later Virtualbox).
+Terraform a Stackato cluster on Amazon AWS and OpenStack.
 
 ##### 1. Install Terraform
 https://terraform.io/downloads.html

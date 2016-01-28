@@ -6,6 +6,9 @@ https://terraform.io/downloads.html
 
 ##### 2. Setup your Stackato cluster with make.sh
 
+Checkout the latest release:
+`git checkout v0.4.0`
+
 Print the help of make.sh:
 ```
 On Linux: ./make.sh --help

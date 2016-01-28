@@ -73,3 +73,8 @@ variable dataservices {
 # Using 65535 to support different version of Stackato based OS
 variable ephemeral_port_from { default = 41000 }
 variable ephemeral_port_to   { default = 65535 }
+
+variable stackato_automation_path {
+  description = "Location of the Stackato automation scripts on the core node"
+  default = "/opt/stackato-automation"
+}

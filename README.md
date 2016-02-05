@@ -35,7 +35,7 @@ cd out
 Then:
 - Choose your cluster configuration in config.tf. The name of the cluster (key cluster_name) will be asked while launching Terraform
 - Choose your OpenStack configuration in config-openstack.tf
-- Make sure you uploaded your public SSH key (see doc: http://docs.openstack.org/user-guide/configure_access_and_security_for_instances.html#import-a-key-pair) and update the variable `ssh_key_name` in config-amazon.tf
+- Make sure you uploaded your public SSH key (see doc: http://docs.openstack.org/user-guide/configure_access_and_security_for_instances.html#import-a-key-pair) and update the variable `ssh_key_name` in config-openstack.tf
 
 ##### 3. Start the cluster
 In a terminal, move to the root directory containing the Terraform files.

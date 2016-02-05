@@ -24,14 +24,18 @@ function kato_node_rename {
   run_as "stackato" "$KATO_BIN node rename $cluster_hostname --no-restart"
 }
 
-function kato_defer_node_setup_core {
+function kato_node_setup_core {
   local cluster_hostname="${1:?undefined input}"
   run_as "stackato" "$KATO_BIN node setup core api.${cluster_hostname}"
 }
 
+function kato_node_setup_load_balancer {
+  run_as "stackato" "$KATO_BIN node setup load_balancer --force"
+}
+
 function kato_node_remove() {
   local roles="${1:---all}"
-  run_as "stackato" "$KATO_BIN node remove ${roles}"
+  run_as "stackato" "$KATO_BIN role remove ${roles}"
 }
 
 function kato_role_add() {
@@ -50,4 +54,11 @@ function kato_set_upstream_proxy() {
   run_as "stackato" "$KATO_BIN config set dea_ng environment/app_http_proxy http://${proxy_ip}:${proxy_port}"
   run_as "stackato" "$KATO_BIN config set dea_ng environment/app_https_proxy http://${proxy_ip}:${proxy_port}"
   service_mgnt "polipo" "restart"
+}
+
+function kato_config_set() {
+  local key="${1:?missing input}"
+  local value="${2:?missing input}"
+
+  run_as "stackato" "$KATO_BIN config set $key $value"
 }

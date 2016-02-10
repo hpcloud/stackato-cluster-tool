@@ -45,7 +45,7 @@ variable core {
   description = "Configuration of the Core node"
   default = {
     "count" = 1
-    "roles" = "core"
+    "roles" = "core,controller"
     "visibility" = "public"
   }
 }
@@ -62,8 +62,17 @@ variable dea {
 variable dataservices {
   description = "Configuration of the Dataservices nodes"
   default = {
-    "count" = 1
+    "count" = 0
     "roles" = "data-services"
+    "visibility" = "private"
+  }
+}
+
+variable controller {
+  description = "Configuration of the Cloud Controller nodes"
+  default = {
+    "count" = 1
+    "roles" = "controller"
     "visibility" = "private"
   }
 }

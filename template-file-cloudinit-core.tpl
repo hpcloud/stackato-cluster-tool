@@ -18,4 +18,4 @@ runcmd:
  - while [ ! -d ${stackato_automation_path} ]; do echo "Waiting for ${stackato_automation_path}"; sleep 5; done
  - find ${stackato_automation_path} -type f -exec dos2unix {} \;
  - chmod u+x ${stackato_automation_path}/configure-core.sh
- - ${stackato_automation_path}/configure-core.sh ${core_password} ${cluster_hostname} ${stackato_automation_path}
+ - ${stackato_automation_path}/configure-core.sh ${core_password} ${cluster_hostname} ${stackato_automation_path} ${roles}

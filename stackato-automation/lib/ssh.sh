@@ -39,6 +39,7 @@ function ssh_copy_ssh_key() {
   local ip="${1:?missing input}"
   local user="${2:?missing input}"
   local password="${3:?missing input}"
+  local pubkey_path=${4:?missing input}
 
-  run_as "stackato" "sshpass -p \"${password}\" ssh-copy-id ${user}@${ip}"
+  cat $pubkey_path | sshpass -p "${password}" ssh -o StrictHostKeyChecking=no ${user}@${ip} 'cat >> .ssh/authorized_keys'
 }

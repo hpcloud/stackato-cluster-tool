@@ -51,14 +51,27 @@ function kato_set_upstream_proxy() {
   local proxy_port="${2:?undefined input}"
 
   run_as "stackato" "$KATO_BIN op upstream_proxy set ${proxy_ip}:${proxy_port}"
-  run_as "stackato" "$KATO_BIN config set dea_ng environment/app_http_proxy http://${proxy_ip}:${proxy_port}"
-  run_as "stackato" "$KATO_BIN config set dea_ng environment/app_https_proxy http://${proxy_ip}:${proxy_port}"
   service_mgnt "polipo" "restart"
 }
 
+function kato_config_get() {
+  local key="${@:?missing input}"
+
+  run_as "stackato" "$KATO_BIN config get $key"
+}
+
+# Should run this function after the node is attached
+# because the redis node data are overwritten by the
+# cluster redis data when attaching the node
 function kato_config_set() {
   local key="${1:?missing input}"
   local value="${2:?missing input}"
 
-  run_as "stackato" "$KATO_BIN config set $key $value"
+  if [ "$(kato_config_get $key)" != "$value" ]; then
+    run_as "stackato" "$KATO_BIN config set $key $value"
+  fi
+}
+
+function kato_get_core_ip() {
+   run_as "stackato" "$KATO_BIN node list | grep primary | cut -d \" \" -f 1"
 }

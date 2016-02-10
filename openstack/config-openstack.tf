@@ -54,6 +54,7 @@ variable openstack_flavor_name {
     "core" = "standard.large"
     "dea" = "standard.large"
     "dataservices" = "standard.large"
+    "controller" = "standard.large"
   }
 }
 

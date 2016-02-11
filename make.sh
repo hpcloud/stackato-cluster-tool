@@ -80,10 +80,10 @@ function copy_terraform_config() {
     mkdir -p $output_dir
     find $CWD -maxdepth 1 -type f \( -name "*.tf" -or -name "*.tpl" \) -exec cp {} $output_dir \;
     cp $platform_dir/* $output_dir
-    cp $version_dir $output_dir
+    cp $version_dir $output_dir/var-stackato-version.tf
     cp -r $provisioner_dir $output_dir
     message "info" "$MSG_TERRAFORM_CONFIG_COPY_DONE" "$version" "$platform"
-    message "stdout" "$output_dir"
+    message "stdout" "$output_dir\n"
   fi
 
 }

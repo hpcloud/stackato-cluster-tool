@@ -18,31 +18,6 @@
 #     OS_USERNAME=stefanb
 #     OS_PASSWORD='your password'
 #
-variable os_auth_url {
-  description = "OpenStack URL to authenticate"
-  default = "https://region-a.geo-1.identity.hpcloudsvc.com:35357/v2.0/"
-}
-
-variable os_tenant_name {
-  description = "OpenStack tenant"
-  default = "hpcs@activestate.com-tenant1"
-}
-
-variable os_username {
-  description = "Username to connect to OpenStack"
-  default = ""
-}
-
-variable os_password {
-  description = "Password to connect to OpenStack"
-  default = ""
-}
-
-variable os_region_name {
-  description = "Region to deploy each node"
-  default = "region-b.geo-1"
-}
-
 variable ssh_key_name {
   description = "SSH key name used to connect to instances"
   default = "stefan-win-key"

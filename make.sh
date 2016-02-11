@@ -19,7 +19,7 @@ MSG_UNSUPPORTED_PLATFORM="The platform %s is not supported\n"
 MSG_SEE_USAGE="See usage ($0 --help)\n"
 MSG_PLATFORM_DIR_NOT_FOUND="The plaform directory %s not found\n"
 MSG_INTERNAL_UNKNOWN_MSG_TYPE="Internal error: unknown message type %s\n"
-MSG_TERRAFORM_CONFIG_COPY_DONE="Terraform config copied for %s on platform %s in: "
+MSG_TERRAFORM_CONFIG_COPY_DONE="Terraform config copied for %s for %s:\n"
 
 # Print the usage
 function usage(){

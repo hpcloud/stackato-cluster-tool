@@ -19,16 +19,12 @@
 
 variable cluster_name {
   description = "Name of the cluster"
+  default = "YOUR_CLUSTER_NAME"
 }
 
 variable cluster_hostname {
   description = "Cluster hostname (endpoint)"
-  default = "stefan.com"
-}
-
-variable provisioner_bin_url {
-  description = "URL to download the provisioner"
-  default = "https://www.dropbox.com/s/eu29x762ao7o43x/stackato-provisioner"
+  default = "YOUR_CLUSTER_HOSTNAME"
 }
 
 variable wait_core_timeout {

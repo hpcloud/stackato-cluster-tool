@@ -1,6 +1,13 @@
 #!/usr/bin/env bash
 set -e
 
+# Default value
+export PLATFORM="openstack"
+export TF_CONFIG_PATH="out"
+export NB_DATASERVICES="1"
+export NB_DEA="2"
+export NB_CONTROLLER="1"
+
 # Usage message
 function usage() {
   >&2 echo "$MSG_USAGE"
@@ -41,7 +48,7 @@ export MSG_USAGE="
     OTHER PARAMETERS:
       --debug: Turn on the debug mode
       -h | --help: Print the usage
-      --help-long: Print the full usage (tips: $0 --help-lomg|less)"
+      --help-long: Print the full usage (tips: $0 --help-long|less)"
 
 export MSG_USAGE_LONG="
     Structure of FILE for the option -f / --file:
@@ -84,13 +91,6 @@ function get_option_file() {
 }
 
 function main() {
-
-  # Default value
-  export PLATFORM="openstack"
-  export TF_CONFIG_PATH="out"
-  export NB_DATASERVICES="1"
-  export NB_DEA="2"
-  export NB_CONTROLLER="1"
 
   CWD="$(dirname $0)" && cd $CWD
 

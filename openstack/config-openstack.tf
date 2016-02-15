@@ -18,6 +18,11 @@
 #     OS_USERNAME=stefanb
 #     OS_PASSWORD='your password'
 #
+variable os_region_name {
+  description = "Region to deploy each node"
+  default = "region-b.geo-1"
+}
+
 variable ssh_key_name {
   description = "SSH key name used to connect to instances"
   default = "stefan-win-key"

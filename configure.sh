@@ -37,7 +37,7 @@ export MSG_USAGE="
       -p | --platform: Cluster platform (openstack or amazon - default: $PLATFORM)
       -n | --name: Cluster name (e.g. yourname)
       -h | --hostname: Hostname of the cluster (e.g. yourname.com)
-      -k | --ssh-key: SSH key to connect to the core node
+      -k | --ssh-key: SSH key name to connect to the core node
 
       -d  | --dea: number of DEA nodes (default: $NB_DEA)
       -cc | --controller: number of additional Cloud Controller nodes (default: $NB_CONTROLLER)
@@ -79,12 +79,13 @@ function get_option_file() {
   local option_index=1
   local file_path=""
 
-  for i in $@; do
-    if [ "$i" == "--file" -o "$i" == "-f" ]; then
-      file_path=${@:$((option_index + 1)):1}
-    else
-      option_index=$(( $option_index + 1 ))
-    fi
+  while [ "$#" -gt 0 ]; do
+    case "$1" in
+      -f | --file ) file_path="$file_path $2"; shift 2;;
+      --) shift; break ;;
+      * ) shift ;;
+      "") break ;;
+    esac
   done
 
   echo "$file_path"
@@ -94,16 +95,24 @@ function main() {
 
   CWD="$(dirname $0)" && cd $CWD
 
+  # Debug mode
+  [[ "$@" == *"--debug"* ]] && set -x
+
+  # Print usage if no option
+  [ "$#" -eq 0 ] && usage && exit 1
+
   # Get the paramters from the parameter -f / --file
   if [[ "$@" == *"--file"* || "$@" == *"-f"* ]]; then
-    source $(get_option_file "$@")
+    for c in $(get_option_file "$@"); do
+      source $c
+    done
   fi
-
+  
   # Parse parameters
-  [ "$#" -eq 0 ] && usage && exit 1
-  while true; do
+  while [ "$#" -gt 0 ]; do
     case "$1" in
       # Stackato options:
+      -f  | --file        ) shift 2 ;; # Done above
       -c  | --config      ) export TF_CONFIG_PATH="$2"    ; shift 2 ;;
       -p  | --platform    ) export PLATFORM="$2"          ; shift 2 ;;
       -n  | --name        ) export CLUSTER_NAME="$2"      ; shift 2 ;;
@@ -142,6 +151,7 @@ function main() {
     $NB_DEA $NB_CONTROLLER $NB_DATASERVICES
 
   if [ "$PLATFORM" == "openstack" ]; then
+    env
     : ${OS_REGION_NAME:?missing input --os-region}
     : ${EXTERNAL_GATEWAY_UUID:?missing input --external_gateway_uuid}
     : ${FLOATING_IP_POOL_NAME:?missing input --floating_ip_pool_name}

@@ -66,6 +66,11 @@ export MSG_USAGE_LONG="
       (--os-region)        export OS_REGION_NAME
       (--ext-gw-uuid)      export EXTERNAL_GATEWAY_UUID
       (--floating-ip-pool) export FLOATING_IP_POOL_NAME
+
+      FLAVOR_CORE: OpenStack flavor for the core node
+      FLAVOR_DEA: OpenStack flavor for DEA nodes
+      FLAVOR_DATASERVICES: Openstack flavor for data services node
+      FLAVOR_CC: OpenStack flavor for Cloud Controller nodes
 "
 
 export MSG_DONE_OPENSTACK="Done.\nNext step:\n1. Export OS_AUTH_URL, OS_TENANT_NAME, OS_USERNAME and OS_PASSWORD"
@@ -183,11 +188,22 @@ function set_openstack_config() {
   local os_region_name="${3:?missing input}"
   local external_gateway_uuid="${4:?missing input}"
   local floating_ip_pool_name="${5:?missing input}"
-  
+
+  local -A properties=([core]=$FLAVOR_CORE
+                         [dea]=$FLAVOR_DEA
+                         [dataservices]=$FLAVOR_DATASERVICES
+                         [controller]=$FLAVOR_CC)
+
   set_tf_variable $openstack_config_path "ssh_key_name" 2 "default" $ssh_key_name
   set_tf_variable $openstack_config_path "os_region_name" 2 "default" $os_region_name
   set_tf_variable $openstack_config_path "external_gateway_uuid" 2 "default" $external_gateway_uuid
   set_tf_variable $openstack_config_path "floating_ip_pool_name" 2 "default" $floating_ip_pool_name
+
+  for p in ${!properties[@]}; do
+    if [ ! -z "${properties[$p]}" ]; then
+      sed -i "s/$p = .*/$p = \"${properties[$p]}\"/" $openstack_config_path
+    fi
+  done
 }
 
 function set_amazon_config() {

@@ -71,6 +71,7 @@ export MSG_USAGE_LONG="
       FLAVOR_DEA: OpenStack flavor for DEA nodes
       FLAVOR_DATASERVICES: Openstack flavor for data services node
       FLAVOR_CC: OpenStack flavor for Cloud Controller nodes
+      INSECURE: Set to use the insecure mode (no SSL check)
 "
 
 export MSG_DONE_OPENSTACK="Done.\nNext step:\n1. Export OS_AUTH_URL, OS_TENANT_NAME, OS_USERNAME and OS_PASSWORD"
@@ -156,13 +157,16 @@ function main() {
     $NB_DEA $NB_CONTROLLER $NB_DATASERVICES
 
   if [ "$PLATFORM" == "openstack" ]; then
-    env
     : ${OS_REGION_NAME:?missing input --os-region}
     : ${EXTERNAL_GATEWAY_UUID:?missing input --external_gateway_uuid}
     : ${FLOATING_IP_POOL_NAME:?missing input --floating_ip_pool_name}
 
     set_openstack_config $TF_CONFIG_PATH/config-openstack.tf $SSH_KEY_NAME $OS_REGION_NAME \
       $EXTERNAL_GATEWAY_UUID $FLOATING_IP_POOL_NAME
+
+    if [ ! -z "$INSECURE" ]; then
+      set_openstack_insecure "$TF_CONFIG_PATH/provider-openstack.tf" 
+    fi
 
     >&2 printf "$MSG_DONE_OPENSTACK"
   fi
@@ -204,7 +208,19 @@ function set_openstack_config() {
       sed -i "s/$p = .*/$p = \"${properties[$p]}\"/" $openstack_config_path
     fi
   done
+
 }
+
+function set_openstack_insecure() {
+  local os_provider_config_path="${1:?missing input}"
+
+  if [ -f "$os_provider_config_path" ]; then
+    echo -e "provider \"openstack\" {\n    insecure = \"true\"\n}" >> $os_provider_config_path
+  else
+    >&2 echo "OpenStack configuration $os_provider_config_path does not exist"
+  fi
+}
+
 
 function set_amazon_config() {
   :

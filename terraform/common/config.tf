@@ -40,36 +40,36 @@ variable core_password { # could use a random password when Terraform support it
 variable core {
   description = "Configuration of the Core node"
   default = {
-    "count" = 1
-    "roles" = "core,controller"
-    "visibility" = "public"
+    count = 1
+    roles = "core,controller"
+    visibility = "public"
   }
 }
 
 variable dea {
   description = "Configuration of the DEA nodes"
   default = {
-    "count" = 1
-    "roles" = "dea"
-    "visibility" = "private"
+    count = 1
+    roles = "dea"
+    visibility = "private"
   }
 }
 
 variable dataservices {
   description = "Configuration of the Dataservices nodes"
   default = {
-    "count" = 0
-    "roles" = "data-services"
-    "visibility" = "private"
+    count = 0
+    roles = "data-services"
+    visibility = "private"
   }
 }
 
 variable controller {
   description = "Configuration of the Cloud Controller nodes"
   default = {
-    "count" = 1
-    "roles" = "controller"
-    "visibility" = "private"
+    count = 1
+    roles = "controller"
+    visibility = "private"
   }
 }
 
@@ -83,3 +83,4 @@ variable stackato_automation_path {
   description = "Location of the Stackato automation scripts on the core node"
   default = "/opt/stackato-automation"
 }
+

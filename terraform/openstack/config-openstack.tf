@@ -31,10 +31,10 @@ variable ssh_key_name {
 variable openstack_flavor_name {
   description = "OpenStack flavor ID for each node type"
   default = {
-    "core" = "standard.large"
-    "dea" = "standard.large"
-    "dataservices" = "standard.large"
-    "controller" = "standard.large"
+    core = "standard.large"
+    dea = "standard.large"
+    dataservices = "standard.large"
+    controller = "standard.large"
   }
 }
 
@@ -49,3 +49,4 @@ variable floating_ip_pool_name {
   description = "The name of the floating IPs pool that will be used to attach to public facing nodes"
   default = "Ext-Net"
 }
+

@@ -257,5 +257,24 @@ resource "aws_network_acl" "private" {
         to_port = 0
     }
 
+    ingress {
+        protocol = -1
+        rule_no = 140
+        action = "allow"
+        cidr_block =  "${aws_subnet.private.cidr_block}"
+        from_port = 0
+        to_port = 0
+    }
+
+    ## Allow ICMP echo request traffic to the private subnet
+    egress {
+        protocol = -1
+        rule_no = 140
+        action = "allow"
+        cidr_block =  "${aws_subnet.private.cidr_block}"
+        from_port = 0
+        to_port = 0
+    }
+
     tags { Name = "cluster-${var.cluster_name}-acl-private" }
 }

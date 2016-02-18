@@ -4,3 +4,9 @@ function service_mgnt {
 
   service $service $state
 }
+
+function service_autostart {
+  local service="$1"
+  update-rc.d $service defaults
+}
+

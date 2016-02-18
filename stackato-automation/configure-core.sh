@@ -19,6 +19,7 @@ node_ready.wait_flag ".node_ready_flag"
 roles_array=($(echo $roles|tr "," " "))
 
 message "info" "> Start the APT Cacher"
+service_autostart "apt-cacher-ng"
 service_mgnt "apt-cacher-ng" "start"
 
 message "info" "> Update the password of the stackato account"

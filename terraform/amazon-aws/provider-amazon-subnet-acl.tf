@@ -259,7 +259,7 @@ resource "aws_network_acl" "private" {
 
     ingress {
         protocol = -1
-        rule_no = 140
+        rule_no = 141
         action = "allow"
         cidr_block =  "${aws_subnet.private.cidr_block}"
         from_port = 0
@@ -269,7 +269,7 @@ resource "aws_network_acl" "private" {
     ## Allow ICMP echo request traffic to the private subnet
     egress {
         protocol = -1
-        rule_no = 140
+        rule_no = 141
         action = "allow"
         cidr_block =  "${aws_subnet.private.cidr_block}"
         from_port = 0

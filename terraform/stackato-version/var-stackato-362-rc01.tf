@@ -1,5 +1,5 @@
 variable "amazon_images" {
-  description = "Amazon AMIs of Stackato 3.6.1"
+  description = "Amazon AMIs of Stackato 3.6.2 RC01"
   default = {
     us-east-1      = "" # Northern Virginia
     us-west-2      = "ami-75779415" # Oregon
@@ -14,8 +14,9 @@ variable "amazon_images" {
 }
 
 variable "openstack_images" {
-  description = "OpenStack images of Stackato 3.6.1"
+  description = "OpenStack images of Stackato 3.6.2 RC01"
   default = {
-    region1        = "" # MPC
+    region1        = "c1d79124-4805-404f-adf3-7fd3bb95b4b5" # MPC
   }
 }
+

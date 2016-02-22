@@ -9,11 +9,11 @@ set -e
 # set -vx
 
 if [ -z "$VERBOSE_IMPORT" ]; then
-  VBoxManage import $BASE_PATH/$IMAGE_NAME | tee /tmp/vboximport.log # --vmname <name>
-  DEST=/dev/stdout
-else 
   VBoxManage import $BASE_PATH/$IMAGE_NAME > /tmp/vboximport.log
   DEST=/dev/null
+else
+  VBoxManage import $BASE_PATH/$IMAGE_NAME | tee /tmp/vboximport.log # --vmname <name>
+  DEST=/dev/stdout
 fi
 
 # Virtualbox uses a 'suggested VM name' when none is provided; parse this out the get the VM name

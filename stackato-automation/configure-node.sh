@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -e
-set -x
+[ ! -z "$DEBUG" ] && set -x
 # Inputs
 core_ip="${1:?missing input}"                   # IP address of the core node
 core_password="${2:?missing input}"             # Password of the Core node
@@ -21,9 +21,12 @@ PROXY_HTTPS_PORT="8123"
 APT_PROXY_HTTP_PORT="3142" # Apt cacher server
 APT_PROXY_HTTPS_PORT="${PROXY_HTTPS_PORT}" # Polipo because Apt cacher too old
 
+declare -A ROUTER_PROPERTIES=( [prevent_x_spoofing]=false )
+ROUTER_ACL_RULES=""
+ROUTER_ACL_DROP_CONN=""
+
 # Get and move to the current working directory
 CWD="$(dirname $0)" && cd $CWD
-# Load the libraries
 source load-libs.sh
 
 message "info" "> Increase the Redis start script timeout"
@@ -57,18 +60,11 @@ ssh_get_remote_public_key "${core_ip}" "stackato" "${core_password}" >> /home/st
 
 roles_array=($(echo $roles|tr "," " "))
 
-# Configure controller
 if [[ "${roles_array[@]/controller}" != "${roles_array[@]}" ]]; then
   message "info" "> Setup of the controller"
   controller_configure ${stackato_shared_cc_dir_ip} ${stackato_shared_cc_dir_password}
 fi
 
-# Configure router
-if [[ "${roles_array[@]/router}" != "${roles_array[@]}" ]]; then
-  message "info" "> TODO Setup the router role"
-fi
-
-# Configure other roles
 if [[ "${roles_array[@]}" != "" ]]; then
   message "info" "> Kato add roles"
   kato_role_add ${roles_array[@]}
@@ -87,3 +83,12 @@ kato_node_attach "${core_ip}" "$roles"
 message "info" "> Setup Apps HTTP Proxy"
 kato_config_set "dea_ng environment/app_http_proxy" "http://${PROXY_HTTP_IP}:${PROXY_HTTP_PORT}"
 kato_config_set "dea_ng environment/app_https_proxy" "http://${PROXY_HTTP_IP}:${PROXY_HTTP_PORT}"
+
+# Configure router
+if [[ "${roles_array[@]/router}" != "${roles_array[@]}" ]]; then
+  message "info" "> Setup the router"
+  router_properties "$(declare -p ROUTER_PROPERTIES)"
+  router_configure_acl "${ROUTER_ACL_RULES}"
+  router_configure_acl_drop_conn "${ROUTER_ACL_DROP_CONN}"
+fi
+

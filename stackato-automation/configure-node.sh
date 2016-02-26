@@ -60,9 +60,15 @@ ssh_get_remote_public_key "${core_ip}" "stackato" "${core_password}" >> /home/st
 
 roles_array=($(echo $roles|tr "," " "))
 
+message "info" ">> Running the pre-attachment setup"
 if [[ "${roles_array[@]/controller}" != "${roles_array[@]}" ]]; then
   message "info" "> Setup of the controller"
   controller_configure ${stackato_shared_cc_dir_ip} ${stackato_shared_cc_dir_password}
+fi
+
+if [[ "${roles_array[@]/router}" != "${roles_array[@]}" ]]; then
+  message "info" "> Rename the router with $cluster_hostname"
+  kato_node_rename "$cluster_hostname"
 fi
 
 if [[ "${roles_array[@]}" != "" ]]; then
@@ -77,13 +83,14 @@ fi
 message "info" "> Waiting for MBUS before attaching the node"
 mbus_wait_ready "${MBUS_IP}" "${MBUS_PORT}"
 
-message "info" "> Attach the node to the core"
+message "info" ">> Attach the node to the core"
 kato_node_attach "${core_ip}" "$roles"
 
 message "info" "> Setup Apps HTTP Proxy"
 kato_config_set "dea_ng environment/app_http_proxy" "http://${PROXY_HTTP_IP}:${PROXY_HTTP_PORT}"
 kato_config_set "dea_ng environment/app_https_proxy" "http://${PROXY_HTTP_IP}:${PROXY_HTTP_PORT}"
 
+message "info" ">> Postattachment setup"
 # Configure router
 if [[ "${roles_array[@]/router}" != "${roles_array[@]}" ]]; then
   message "info" "> Setup the router"

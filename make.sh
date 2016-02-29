@@ -7,7 +7,7 @@ PLATFORM_SUPPORT=(openstack amazon-aws)          # Supported platforms by this t
 
 # Default configuration
 PLATFORM_DEFAULT="openstack"
-VERSION_DEFAULT="terraform/stackato-version/var-stackato-361.tf"
+VERSION_DEFAULT="terraform/stackato-version/var-stackato-362.tf"
 OUTPUT_DIR_DEFAULT="$CWD/out"
 
 ## Message

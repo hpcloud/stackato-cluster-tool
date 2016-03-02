@@ -23,7 +23,7 @@ APT_PROXY_HTTPS_PORT="${PROXY_HTTPS_PORT}" # Polipo because Apt cacher too old
 
 declare -A ROUTER_PROPERTIES=( [prevent_x_spoofing]=false )
 ROUTER_ACL_RULES=""
-ROUTER_ACL_DROP_CONN=""
+ROUTER_ACL_DROP_CONN="true"
 
 # Get and move to the current working directory
 CWD="$(dirname $0)" && cd $CWD
@@ -98,4 +98,3 @@ if [[ "${roles_array[@]/router}" != "${roles_array[@]}" ]]; then
   router_configure_acl "${ROUTER_ACL_RULES}"
   router_configure_acl_drop_conn "${ROUTER_ACL_DROP_CONN}"
 fi
-

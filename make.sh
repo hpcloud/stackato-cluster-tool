@@ -74,6 +74,7 @@ function copy_terraform_config() {
   local common_tf_dir="$CWD/terraform/common"
   local provisioner_dir="$CWD/stackato-automation"
   local cloudinit_dir="$CWD/cloudinit/*"
+  local ssl_cert="$CWD/certs"
 
   if [ ! -d "$platform_dir" ]; then
     message "error" "$MSG_PLATFORM_DIR_NOT_FOUND" "$platform_dir"
@@ -86,6 +87,7 @@ function copy_terraform_config() {
     cp $common_tf_dir/* $output_dir
     cp -r $provisioner_dir $output_dir
     cp -r $cloudinit_dir $output_dir
+    cp -r $ssl_cert/* $output_dir
     message "info" "$MSG_TERRAFORM_CONFIG_COPY_DONE" "$version" "$platform"
     message "stdout" "$output_dir\n"
   fi

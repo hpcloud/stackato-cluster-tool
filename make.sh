@@ -32,6 +32,7 @@ function usage(){
     -o | --out: Output directory (default: $OUTPUT_DIR_DEFAULT)
     -p | --platform: Platform to deploy (default: $PLATFORM_DEFAULT)
     -v | --version: Path of the Stackato version file (default: $VERSION_DEFAULT)
+    -lb| --load-balancer: Add the load balancer configuration
     -h | --help: Show help message
     -d | --debug: Turn on the debug mode
 
@@ -74,24 +75,32 @@ function copy_terraform_config() {
   local common_tf_dir="$CWD/terraform/common"
   local provisioner_dir="$CWD/stackato-automation"
   local cloudinit_dir="$CWD/cloudinit/*"
-  local ssl_cert="$CWD/certs"
 
   if [ ! -d "$platform_dir" ]; then
     message "error" "$MSG_PLATFORM_DIR_NOT_FOUND" "$platform_dir"
   else
     rm -rf $output_dir
     mkdir -p $output_dir
-    find $CWD -maxdepth 1 -type f \( -name "*.tf" -or -name "*.tpl" \) -exec cp {} $output_dir \;
-    find $platform_dir/* -maxdepth 1 -type f \( -name "*.tf" -or -name "*.tpl" \) -exec cp {} $output_dir \;
+    # Copy the platform specific Terraform files
+    find $platform_dir/* -maxdepth 0 -type f \( -name "*.tf" -or -name "*.tpl" \) -exec cp {} $output_dir \;
+    # Copy the Terraform file targetting a specific version of Stackato
     cp $version_dir $output_dir/var-stackato-version.tf
-    cp $common_tf_dir/* $output_dir
-    cp -r $provisioner_dir $output_dir
-    cp -r $cloudinit_dir $output_dir
-    cp -r $ssl_cert/* $output_dir
+
+    cp $common_tf_dir/* $output_dir       # Copy the common Terraform files
+    cp -r $provisioner_dir $output_dir    # Copy the provisioner scripts
+    cp -r $cloudinit_dir $output_dir      # Copy the Cloudinit configuration
     message "info" "$MSG_TERRAFORM_CONFIG_COPY_DONE" "$version" "$platform"
     message "stdout" "$output_dir\n"
   fi
+}
 
+function copy_terraform_loadbalancer() {
+  local platform="$1"
+  local output_dir="$2"
+  local ssl_cert="$CWD/certs"
+
+  cp $CWD/terraform/$platform/load-balancer/*.tf $output_dir
+  cp -r $ssl_cert/* $output_dir
 }
 
 # Main function
@@ -99,6 +108,7 @@ function main() {
   local platform="$PLATFORM_DEFAULT"     # Platform hosting the cluster
   local version="$VERSION_DEFAULT"       # Version to deploy
   local output_dir="$OUTPUT_DIR_DEFAULT" # Default output dir
+  local add_load_balancer=""
 
   # Parse parameters
   while true; do
@@ -107,6 +117,7 @@ function main() {
       -h | --help  )    usage ; exit 1 ;;
       -p | --platform ) shift; platform="$1";   shift;;
       -v | --version )  shift; version="$1";    shift;;
+      -lb| --load-balancer ) add_load_balancer="1"; shift ;;
       -o | --out )      shift; output_dir="$1"; shift;;
       -- ) shift; break ;;
       "" ) break ;;
@@ -116,6 +127,8 @@ function main() {
 
   check_platform_support "$platform"
   copy_terraform_config "$platform" "$version" "$output_dir"
+  [ ! -z "$add_load_balancer" ] && copy_terraform_loadbalancer "$platform" "$output_dir"
+
 }
 
 main "$@"

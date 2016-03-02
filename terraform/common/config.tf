@@ -73,6 +73,23 @@ variable controller {
   }
 }
 
+variable router {
+  description = "Configuration of the Router nodes"
+  default = {
+    count = 1
+    roles = "router"
+    visibility = "public"
+  }
+}
+
+variable load_balancer {
+  description = "Configuration of the load balancer"
+  default = {
+    certificate_path = ""
+    private_key_path = ""
+  }
+}
+
 # Ephemeral port range of Stackato for the Ingress traffic
 # See file /proc/sys/net/ipv4/ip_local_port_range
 # Using 65535 to support different version of Stackato based OS
@@ -83,4 +100,3 @@ variable stackato_automation_path {
   description = "Location of the Stackato automation scripts on the core node"
   default = "/opt/stackato-automation"
 }
-

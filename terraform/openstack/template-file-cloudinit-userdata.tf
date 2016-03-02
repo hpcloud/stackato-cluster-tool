@@ -51,3 +51,17 @@ resource "template_file" "controller" {
       stackato_automation_path = "${var.stackato_automation_path}"
   }
 }
+
+# Cloudinit user data to set up Dataservices nodes
+resource "template_file" "router" {
+  template = "${file("template-file-cloudinit-nodes.tpl")}"
+
+  vars {
+      core_ip = "${openstack_compute_instance_v2.core.network.0.fixed_ip_v4}"
+      core_password = "${var.core_password}"
+      roles = "${lookup(var.router, "roles")}"
+      wait_core_timeout = "${var.wait_core_timeout}"
+      cluster_hostname = "${var.cluster_hostname}"
+      stackato_automation_path = "${var.stackato_automation_path}"
+  }
+}

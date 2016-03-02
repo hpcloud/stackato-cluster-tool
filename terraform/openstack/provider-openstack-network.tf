@@ -44,3 +44,10 @@ resource "openstack_compute_floatingip_v2" "floatips" {
   region = "${var.os_region_name}"
   pool = "${var.floating_ip_pool_name}"
 }
+
+# Create floating IPs for Stackato Routers
+resource "openstack_compute_floatingip_v2" "floatips_routers" {
+  count = "${lookup(var.router, "count")}"
+  region = "${var.os_region_name}"
+  pool = "${var.floating_ip_pool_name}"
+}

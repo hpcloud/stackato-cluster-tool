@@ -81,7 +81,7 @@ function copy_terraform_config() {
     rm -rf $output_dir
     mkdir -p $output_dir
     find $CWD -maxdepth 1 -type f \( -name "*.tf" -or -name "*.tpl" \) -exec cp {} $output_dir \;
-    cp $platform_dir/* $output_dir
+    find $platform_dir/* -maxdepth 1 -type f \( -name "*.tf" -or -name "*.tpl" \) -exec cp {} $output_dir \;
     cp $version_dir $output_dir/var-stackato-version.tf
     cp $common_tf_dir/* $output_dir
     cp -r $provisioner_dir $output_dir

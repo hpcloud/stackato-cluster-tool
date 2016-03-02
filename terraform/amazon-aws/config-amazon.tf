@@ -33,5 +33,6 @@ variable aws_instance_type {
     "dea" = "t2.medium"
     "dataservices" = "t2.medium"
     "controller" = "t2.medium"
+    "router" = "t2.medium"
   }
 }

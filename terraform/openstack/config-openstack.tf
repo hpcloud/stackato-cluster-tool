@@ -35,6 +35,7 @@ variable openstack_flavor_name {
     dea = "standard.large"
     dataservices = "standard.large"
     controller = "standard.large"
+    router = "standard.large"
   }
 }
 
@@ -49,4 +50,3 @@ variable floating_ip_pool_name {
   description = "The name of the floating IPs pool that will be used to attach to public facing nodes"
   default = "Ext-Net"
 }
-

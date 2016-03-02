@@ -40,7 +40,7 @@ resource "template_file" "dataservices" {
   }
 }
 
-# Cloudinit user data to set up Dataservices nodes
+# Cloudinit user data to set up Cloud Controller nodes
 resource "template_file" "controller" {
   depends_on = [ "aws_instance.core"]
   template = "${file("template-file-cloudinit-nodes.tpl")}"
@@ -49,6 +49,21 @@ resource "template_file" "controller" {
       core_ip = "${aws_instance.core.private_ip}"
       core_password = "${var.core_password}"
       roles = "${lookup(var.controller, "roles")}"
+      wait_core_timeout = "${var.wait_core_timeout}"
+      cluster_hostname = "${var.cluster_hostname}"
+      stackato_automation_path = "${var.stackato_automation_path}"
+  }
+}
+
+# Cloudinit user data to set up router nodes
+resource "template_file" "router" {
+  depends_on = [ "aws_instance.core"]
+  template = "${file("template-file-cloudinit-nodes.tpl")}"
+
+  vars {
+      core_ip = "${aws_instance.core.private_ip}"
+      core_password = "${var.core_password}"
+      roles = "${lookup(var.router, "roles")}"
       wait_core_timeout = "${var.wait_core_timeout}"
       cluster_hostname = "${var.cluster_hostname}"
       stackato_automation_path = "${var.stackato_automation_path}"

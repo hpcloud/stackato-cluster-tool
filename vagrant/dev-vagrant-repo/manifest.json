@@ -1,0 +1,23 @@
+{
+  "name": "hpcloud/stackato",
+  "description": "HPE Helion Stackato",
+  "versions": [
+    {
+      "version": "3.6.2",
+      "providers": [
+        {
+          "name": "virtualbox",
+          "url": "https://svmbuild.stackato.com/vagrant/boxes/stackato-v362-virtualbox.box",
+          "checksum_type": "sha256",
+          "checksum": "14809c3f1cf057b499f52a0f6a444bef753b8d82e3e7a25986714f01f1454fb2"
+        },
+        {
+          "name": "vmware",
+          "url": "https://svmbuild.stackato.com/vagrant/boxes/stackato-v362-vmware.box",
+          "checksum_type": "sha256",
+          "checksum": "foo"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,149 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+require 'rbconfig'
+require 'ipaddr'
+require 'yaml'
+
+# Load the configuration
+current_dir    = File.dirname(File.expand_path(__FILE__))
+cluster_config = begin
+  YAML.load_file("#{current_dir}/config.yaml")
+rescue ArgumentError => e
+  puts "Could not parse YAML: #{e.message}"
+end
+
+ENABLE_GUI=cluster_config["enable_gui"]
+network=IPAddr.new(cluster_config["network"]["cidr"])
+
+core_ip=network.succ.succ
+CORE_MEMORY=cluster_config["memory"]
+CORE_CPUS=cluster_config["cpu"]
+CORE_ROLES=cluster_config["core"]["roles"]
+
+STACKATO_AUTOMATION_PATH="/home/stackato/stackato-automation"
+
+STACKATO_USERNAME=cluster_config["username"]
+STACKATO_PASSWORD=cluster_config["password"]
+CLUSTER_HOSTNAME=cluster_config["hostname"]
+
+# Generate a collection of IP assigned to nodes
+node_first_ip=core_ip.succ
+ips=[node_first_ip]
+cluster_config["nodes"].each do |n|
+  (1..n["number"]).each do
+    ips << ips.last.succ
+  end
+end
+
+# Check the host OS type
+def os
+  @os ||= (
+    host_os = RbConfig::CONFIG['host_os']
+    case host_os
+    when /mswin|msys|mingw|cygwin|bccwin|wince|emc/
+      :windows
+    when /darwin|mac os/
+      :macosx
+    when /linux/
+      :linux
+    when /solaris|bsd/
+      :unix
+    else
+      raise Error::WebDriverError, "unknown os: #{host_os.inspect}"
+    end
+  )
+end
+
+os == :windows ? RUN_DOS2UNIX=true : RUN_DOS2UNIX=false
+
+Vagrant.configure(2) do |config|
+  # The most common configuration options are documented and commented below.
+  # For a complete reference, please see the online documentation at
+  # https://docs.vagrantup.com.
+  config.vm.box_url = "http://svmbuild.stackato.com/vagrant/manifest.json"
+  config.vm.box = "hpcloud/stackato"
+  config.vm.box_version = cluster_config["version"]
+
+  config.vm.synced_folder ".", "/vagrant", disabled: true
+
+  config.vm.provider "virtualbox" do |v|
+    v.gui = ENABLE_GUI
+    v.functional_vboxsf = false
+  end
+
+  config.ssh.username = "#{STACKATO_USERNAME}"
+  config.ssh.password = "#{STACKATO_PASSWORD}"
+
+  # Core node setup
+  config.vm.define "core",  primary: true do |core|
+    # Provider configuration
+    core.vm.provider "virtualbox" do |v|
+      v.memory = cluster_config["core"]["memory"]
+      v.cpus = cluster_config["core"]["cpu"]
+    end
+
+    core.vm.network :private_network, ip: core_ip.to_s
+    #core.vm.network "forwarded_port", guest: 80, host: 80
+    #core.vm.network "forwarded_port", guest: 443, host: 443
+
+    # Stackato configuration
+    # $ status stackato
+    # stackato start/pre-start, process 10916 (when in progress)
+    # stackato start/running (when started)
+    # Provisioning
+    core.vm.provision "file", source: "../stackato-automation", destination: "/home/stackato/"
+    core.vm.provision "shell", inline: <<-SHELL
+      sudo sed -i "s/timeout 90/timeout 300/" /home/stackato/stackato/etc/firstboot/tasks/05-wait-for-config-redis.sh
+
+      if [ "#{RUN_DOS2UNIX}" == "true" ]; then
+        sudo apt-get update
+        sudo apt-get install -y dos2unix
+        for file in $(find #{STACKATO_AUTOMATION_PATH} -type f); do dos2unix $file; done
+      fi
+
+      sudo bash -c 'echo "stackato ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers'
+      sudo chmod ugo+x #{STACKATO_AUTOMATION_PATH}/configure-core.sh
+      sudo #{STACKATO_AUTOMATION_PATH}/configure-core.sh #{STACKATO_PASSWORD} #{CLUSTER_HOSTNAME} #{STACKATO_AUTOMATION_PATH} #{CORE_ROLES}
+    SHELL
+  end
+
+  nodes_counter=0
+  cluster_config["nodes"].each do |n|
+    node_name=n["name"]
+    node_roles=n["roles"]
+    node_number=n["number"]
+    node_memory=n["memory"]
+    node_cpu=n["cpu"]
+    (1..node_number).each do |i|
+      config.vm.define "#{node_name}-#{i}" do |node|
+        # Provider configuration
+        node.vm.provider "virtualbox" do |v|
+          v.memory = node_memory
+          v.cpus = node_cpu=n["cpu"]
+        end
+
+        # Stackato configuration
+        node.vm.network :private_network, ip: ips[nodes_counter+i].to_s
+        node.vm.provision "shell", inline: <<-SHELL
+          sudo sed -i "s/timeout 90/timeout 300/" /home/stackato/stackato/etc/firstboot/tasks/05-wait-for-config-redis.sh
+          sudo apt-get update
+          sudo apt-get install -y sshpass
+          bash -c 'while ! nc -z #{core_ip} 3142; do echo Waiting for APT Cacher on #{core_ip}; sleep 5; done'
+          while ! sshpass -p #{STACKATO_PASSWORD} ssh -o StrictHostKeyChecking=no stackato@#{core_ip} test -d #{STACKATO_AUTOMATION_PATH}; do echo "Waiting for #{core_ip}:#{STACKATO_AUTOMATION_PATH}"; sleep 5; done
+          sshpass -p #{STACKATO_PASSWORD} rsync -a stackato@#{core_ip}:#{STACKATO_AUTOMATION_PATH}/ #{STACKATO_AUTOMATION_PATH}
+
+          if [ "#{RUN_DOS2UNIX}" == "true" ]; then
+            sudo apt-get install -y dos2unix
+            for file in $(find #{STACKATO_AUTOMATION_PATH} -type f); do dos2unix $file; done
+          fi
+
+          sudo bash -c 'echo "stackato ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers'
+          sudo chmod ugo+x #{STACKATO_AUTOMATION_PATH}/configure-node.sh
+          sudo #{STACKATO_AUTOMATION_PATH}/configure-node.sh #{core_ip} #{STACKATO_PASSWORD} #{CLUSTER_HOSTNAME} #{STACKATO_AUTOMATION_PATH} #{node_roles}
+        SHELL
+      end
+    end
+    nodes_counter=node_number
+  end
+end

@@ -1,0 +1,28 @@
+version: 3.6.2
+username: stackato
+password: stackato
+hostname: stefan.com
+enable_gui: true
+
+network:
+  # bridged or nat
+  mode: nat
+  cidr: 10.0.1.0/24
+
+core:
+  roles: core,controller
+  memory: 2048
+  cpu: 2
+
+nodes:
+  - name: dea
+    roles: dea
+    number: 1
+    memory: 2046
+    cpu: 2
+
+  - name: dataservice
+    roles: dataservices
+    number: 0
+    memory: 2048
+    cpu: 2

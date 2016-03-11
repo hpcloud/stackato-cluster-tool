@@ -12,7 +12,7 @@ function node_ready.wait_flag() {
 
   local flag_path="${FLAG_DIR}/$flag_name"
 
-  while [ ! -f "$flag_path" ]; do
+  while [ ! -f "$flag_path" -a "$(status stackato)" != "stackato start/running" ]; do
     >&2 echo "Waiting for node to be ready (flag $flag_path)"
     sleep $sleep_time
   done

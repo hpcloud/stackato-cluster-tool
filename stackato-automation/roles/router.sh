@@ -23,9 +23,10 @@ function router_properties() {
   done
 }
 
+# acl_rules: set to "none" if no rules
 function router_configure_acl() {
   local acl_rules="${1}"
-  if [ ! -z "$acl_rules" ]; then
+  if [ ! -z "$acl_rules" -o "$acl_rules" != "none" ]; then
     kato_config_set "router2g acl/enabled" "true"
     kato_config_set "router2g acl/rules" "${acl_rules}"
   fi

@@ -85,8 +85,8 @@ variable router {
 variable load_balancer {
   description = "Configuration of the load balancer"
   default = {
-    certificate_path = ""
-    private_key_path = ""
+    certificate_path = "stackato-crt.pem"
+    private_key_path = "stackato-key.pem"
   }
 }
 

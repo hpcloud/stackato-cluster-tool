@@ -1,6 +1,8 @@
 # stackato-cluster-tool
 Terraform a Stackato cluster on Amazon AWS and OpenStack.
 
+Note: For Vagrant, see the folder `vagrant/`.
+
 ##### 1. Install Terraform
 https://terraform.io/downloads.html
 
@@ -18,13 +20,16 @@ On Windows: bash -c "./make.sh --help"
 ###### For an Amazon cluster
 Create the basic configuration:
 ```
-make.sh -p amazon-aws
+make.sh -p amazon-aws [-lb]
 cd out
 ```
+Use the option -lb to add the load balance configuration.
+
 Then:
 - Choose your cluster configuration in config.tf. The name of the cluster (key cluster_name) will be asked while launching Terraform
 - Choose your Amazon configuration in config-amazon.tf, especially aws_access_key and aws_secret_key. Check the Amazon documentation http://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSGettingStartedGuide/AWSCredentials.html to get those two keys.
 - Make sure you uploaded your public SSH key (see doc: http://docs.aws.amazon.com/gettingstarted/latest/wah/getting-started-prereq.html#create-a-key-pair) and update the variable `ssh_key_name` in config-amazon.tf
+- If using the load balancer option, your ssl certificate and key should be in the `out` folder and the keys `certificate_path` and `private_key_path` must be updated in `config.tf`.
 
 ###### For an OpenStack cluster
 Create the basic configuration:
@@ -43,6 +48,8 @@ In a terminal, move to the root directory containing the Terraform files.
 Check that the configuration from step 2 is valid by running `terraform plan`.
 
 Start the cluster by running `terraform apply`.
+
+Tips: you can follow the provisioning progress on each node from the file `/var/log/cloud-init-output.log`.
 
 ##### 4. Modify a running cluster
 You can update the configuration file config.tf then run `terraform plan` and `terraform apply` again.

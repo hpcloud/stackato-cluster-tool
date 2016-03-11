@@ -6,6 +6,8 @@ See file `config.yaml`
 
 ## Start your cluster
 
+**Note**: Stackato doesn't work with Vagrant because nodes are attached to the core node using their Vagrant NAT NIC which is the same IP between all Vagrant VMs. 
+
 ```
 vagrant up
 ```

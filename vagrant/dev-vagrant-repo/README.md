@@ -12,4 +12,4 @@ vagrant up
 vagrant ssh -c "ip -4 address"
 ```
 
-#### 5. Add a DNS entry for vagrant.stackato.com in your hosts file or DNS server
+#### 5. Add a DNS entry for your vagrant server hostname in your hosts file or DNS server

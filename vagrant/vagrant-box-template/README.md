@@ -4,6 +4,8 @@
 #### 2. Take note of the MAC address of the imported VM and write it in the Vagrantfile
 #### 3. Create the box:
 
+Note: The VM needs to be passwordless sudo before converting it into a Vagrant box.
+
 ```
 vagrant package --base NAME_OF_THE_VM --output NAME_OF_THE_VM.box --vagrantfile Vagrantfile
 ```

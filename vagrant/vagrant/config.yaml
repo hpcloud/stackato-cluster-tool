@@ -3,9 +3,10 @@ username: stackato
 password: stackato
 hostname: stefan.com
 enable_gui: true
+provision_logs: /home/stackato/provision.log
+debug: true
 
 network:
-  # bridged or nat
   mode: nat
   cidr: 10.0.1.0/24
 
@@ -18,11 +19,27 @@ nodes:
   - name: dea
     roles: dea
     number: 1
-    memory: 2046
+    memory: 2048
     cpu: 2
+    proxied: false
 
   - name: dataservice
     roles: dataservices
     number: 0
     memory: 2048
     cpu: 2
+    proxied: false
+
+  - name: router
+    roles: router
+    number: 0
+    memory: 2048
+    cpu: 1
+    proxied: false
+
+  - name: controller
+    roles: controller
+    number: 0
+    memory: 2048
+    cpu: 1
+    proxied: false

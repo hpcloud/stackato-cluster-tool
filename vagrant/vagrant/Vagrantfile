@@ -14,18 +14,13 @@ rescue ArgumentError => e
 end
 
 ENABLE_GUI=cluster_config["enable_gui"]
-network=IPAddr.new(cluster_config["network"]["cidr"])
-
-core_ip=network.succ.succ
-CORE_MEMORY=cluster_config["memory"]
-CORE_CPUS=cluster_config["cpu"]
-CORE_ROLES=cluster_config["core"]["roles"]
-
 STACKATO_AUTOMATION_PATH="/home/stackato/stackato-automation"
-
 STACKATO_USERNAME=cluster_config["username"]
 STACKATO_PASSWORD=cluster_config["password"]
 CLUSTER_HOSTNAME=cluster_config["hostname"]
+
+network=IPAddr.new(cluster_config["network"]["cidr"])
+core_ip=network.succ.succ
 
 # Generate a collection of IP assigned to nodes
 node_first_ip=core_ip.succ
@@ -70,6 +65,7 @@ Vagrant.configure(2) do |config|
   config.vm.provider "virtualbox" do |v|
     v.gui = ENABLE_GUI
     v.functional_vboxsf = false
+    # v.linked_clone = true
   end
 
   config.ssh.username = "#{STACKATO_USERNAME}"
@@ -92,22 +88,38 @@ Vagrant.configure(2) do |config|
     # stackato start/pre-start, process 10916 (when in progress)
     # stackato start/running (when started)
     # Provisioning
-    core.vm.provision "file", source: "../stackato-automation", destination: "/home/stackato/"
+    core.vm.provision "file", source: "../../stackato-automation", destination: "/home/stackato/"
     core.vm.provision "shell", inline: <<-SHELL
+      set -e
+      [ "#{cluster_config['debug']}" == "true" ] && set -x
+
+      export DEBIAN_FRONTEND=noninteractive
       sudo sed -i "s/timeout 90/timeout 300/" /home/stackato/stackato/etc/firstboot/tasks/05-wait-for-config-redis.sh
 
       if [ "#{RUN_DOS2UNIX}" == "true" ]; then
-        sudo apt-get update
-        sudo apt-get install -y dos2unix
-        for file in $(find #{STACKATO_AUTOMATION_PATH} -type f); do dos2unix $file; done
+        echo "Windows host detected. Installing and running dos2unix"
+        sudo apt-get update 1>/dev/null
+        sudo apt-get install -y dos2unix 1>/dev/null
+        for file in $(find #{STACKATO_AUTOMATION_PATH} -type f); do dos2unix $file &>/dev/null; done
+        sudo touch #{STACKATO_AUTOMATION_PATH}/.dos2unix_done
       fi
 
-      sudo bash -c 'echo "stackato ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers'
       sudo chmod ugo+x #{STACKATO_AUTOMATION_PATH}/configure-core.sh
-      sudo #{STACKATO_AUTOMATION_PATH}/configure-core.sh #{STACKATO_PASSWORD} #{CLUSTER_HOSTNAME} #{STACKATO_AUTOMATION_PATH} #{CORE_ROLES}
+
+      PROVISIONER="#{STACKATO_AUTOMATION_PATH}/configure-core.sh"
+      PROVISIONER_OPTS="#{STACKATO_PASSWORD} #{CLUSTER_HOSTNAME} #{STACKATO_AUTOMATION_PATH} #{cluster_config["core"]["roles"]}"
+      PROVISIONER_LOG="#{cluster_config["provision_logs"]}"
+
+      echo "Starting provisioner"
+      nohup $PROVISIONER $PROVISIONER_OPTS >> $PROVISIONER_LOG 2>&1 &
+      # sudo start-stop-daemon --start --quiet --background --make-pidfile \
+      #   --pidfile /run/stackato-provision.pid --startas /bin/bash \
+      #   -- -c "exec $PROVISIONER $PROVISIONER_OPTS >> $PROVISIONER_LOG 2>&1"
+      echo "Provisioner started in background (logs: $PROVISIONER_LOG)"
     SHELL
   end
 
+  # Nodes setup
   nodes_counter=0
   cluster_config["nodes"].each do |n|
     node_name=n["name"]
@@ -115,6 +127,11 @@ Vagrant.configure(2) do |config|
     node_number=n["number"]
     node_memory=n["memory"]
     node_cpu=n["cpu"]
+
+    provisioner_opts=""
+    provisioner_opts << "--use-proxy" if n["proxied"] == "true"
+    provisioner_opts << "--debug"     if cluster_config["debug"] == "true"
+
     (1..node_number).each do |i|
       config.vm.define "#{node_name}-#{i}" do |node|
         # Provider configuration
@@ -126,21 +143,39 @@ Vagrant.configure(2) do |config|
         # Stackato configuration
         node.vm.network :private_network, ip: ips[nodes_counter+i].to_s
         node.vm.provision "shell", inline: <<-SHELL
-          sudo sed -i "s/timeout 90/timeout 300/" /home/stackato/stackato/etc/firstboot/tasks/05-wait-for-config-redis.sh
-          sudo apt-get update
-          sudo apt-get install -y sshpass
-          bash -c 'while ! nc -z #{core_ip} 3142; do echo Waiting for APT Cacher on #{core_ip}; sleep 5; done'
-          while ! sshpass -p #{STACKATO_PASSWORD} ssh -o StrictHostKeyChecking=no stackato@#{core_ip} test -d #{STACKATO_AUTOMATION_PATH}; do echo "Waiting for #{core_ip}:#{STACKATO_AUTOMATION_PATH}"; sleep 5; done
-          sshpass -p #{STACKATO_PASSWORD} rsync -a stackato@#{core_ip}:#{STACKATO_AUTOMATION_PATH}/ #{STACKATO_AUTOMATION_PATH}
+          set -e
+          [ "#{cluster_config['debug']}" == "true" ] && set -x
 
-          if [ "#{RUN_DOS2UNIX}" == "true" ]; then
-            sudo apt-get install -y dos2unix
-            for file in $(find #{STACKATO_AUTOMATION_PATH} -type f); do dos2unix $file; done
+          export DEBIAN_FRONTEND=noninteractive
+          sudo sed -i "s/timeout 90/timeout 300/" /home/stackato/stackato/etc/firstboot/tasks/05-wait-for-config-redis.sh
+
+          if [ "#{n['proxied']}" == "true" ]; then
+            bash -c 'while ! nc -z #{core_ip} 3142; do echo Waiting for APT Cacher on #{core_ip}; sleep 5; done'
+            #TODO: Use the APT proxy from the node
           fi
 
-          sudo bash -c 'echo "stackato ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers'
+          if ! which sshpass &>/dev/null; then
+            echo "Installing sshpass"
+            sudo apt-get update 1>/dev/null
+            sudo apt-get install -y sshpass 1>/dev/null
+          fi
+
+          while ! sshpass -p #{STACKATO_PASSWORD} ssh -o StrictHostKeyChecking=no stackato@#{core_ip} test -d #{STACKATO_AUTOMATION_PATH}; do echo "Waiting for #{core_ip}:#{STACKATO_AUTOMATION_PATH}"; sleep 5; done
+          if [ "#{RUN_DOS2UNIX}" == "true" ]; then
+            while ! sshpass -p #{STACKATO_PASSWORD} ssh -o StrictHostKeyChecking=no stackato@#{core_ip} test -f #{STACKATO_AUTOMATION_PATH}/.dos2unix_done; do echo "Waiting for dos2unix to finish on #{core_ip}:#{STACKATO_AUTOMATION_PATH}"; sleep 5; done
+          fi
+
+          sshpass -p #{STACKATO_PASSWORD} rsync -a stackato@#{core_ip}:#{STACKATO_AUTOMATION_PATH}/ #{STACKATO_AUTOMATION_PATH}
+
           sudo chmod ugo+x #{STACKATO_AUTOMATION_PATH}/configure-node.sh
-          sudo #{STACKATO_AUTOMATION_PATH}/configure-node.sh #{core_ip} #{STACKATO_PASSWORD} #{CLUSTER_HOSTNAME} #{STACKATO_AUTOMATION_PATH} #{node_roles}
+
+          PROVISIONER="#{STACKATO_AUTOMATION_PATH}/configure-node.sh"
+          PROVISIONER_OPTS="--core-ip #{core_ip} --cluster-hostname #{CLUSTER_HOSTNAME} --roles #{node_roles} #{provisioner_opts}"
+          PROVISIONER_LOG="#{cluster_config["provision_logs"]}"
+
+          echo "Starting provisioner"
+          nohup $PROVISIONER $PROVISIONER_OPTS >> $PROVISIONER_LOG 2>&1 &
+          echo "Provisioner started in background (logs: $PROVISIONER_LOG)"
         SHELL
       end
     end

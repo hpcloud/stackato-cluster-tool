@@ -9,13 +9,18 @@ function set_apt_proxy() {
   echo "Acquire::HTTPS::Proxy \"http://${proxy_ip}:${proxy_https_port}\";" >> $apt_proxy_conf
 }
 
-set_bashrc_http_proxy () {
+function get_http_proxy_envvars () {
   local user="${1:?missing input}"
   local proxy_ip="${2:?missing input}"
-  local proxy_port="${3:?missing input}"
+  local http_proxy_port="${3:?missing input}"
+  local https_proxy_port="${4:?missing input}"
 
   local bashrc="/home/$user/.bashrc"
 
-  echo "export http_proxy=http://${proxy_ip}:${proxy_port}" >> $bashrc
-  echo "export https_proxy=http://${proxy_ip}:${proxy_port}" >> $bashrc
+  echo "export http_proxy=http://${proxy_ip}:${http_proxy_port}" >> $bashrc
+  echo "export https_proxy=http://${proxy_ip}:${https_proxy_port}" >> $bashrc
+}
+
+function set_docker_daemon_proxy() {
+
 }

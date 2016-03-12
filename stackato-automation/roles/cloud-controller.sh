@@ -1,8 +1,9 @@
 function controller_configure() {
   # Server storing the shared Cloud Controller data
-  local controller_shared_dir_ip=${1:?missing input}
-  local controller_shared_dir_password="${2:-missing input}"
-  local controller_shared_dir="${CONTROLLER_SHARED_DIR:=/mnt/controller/}"
+  local controller_shared_dir="${1:?missing input}"
+  local controller_shared_dir_ip="${2:?missing input}"
+  local controller_shared_dir_user="${3:?missing input}"
+  local controller_shared_dir_password="${4:-missing input}"
 
   # Default location of the Cloud Controller data
   local data_dir="${DATA_DIR:=/home/stackato/stackato/data}"

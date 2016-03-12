@@ -34,7 +34,7 @@ function main() {
   local use_proxy="false"
   local http_proxy="$core_ip"
   local http_proxy_port="8123"
-  local https_proxy_port="$https_proxy_port"
+  local https_proxy_port="$http_proxy_port"
 
   local apt_proxy="$core_ip"
   local apt_http_proxy_port="3142"
@@ -91,6 +91,10 @@ function main() {
 
   system_setup "$core_ip" "$core_user" "$core_password" \
     "/home/$node_user/.ssh/id_rsa.pub" "/home/$node_user/.ssh/authorized_keys"
+
+  message "info" "> Waiting for node to be ready"
+  node_ready.set_flag ".node_ready_flag"
+  node_ready.wait_flag ".node_ready_flag"
 
   # Wait for supervisord and check config_redis is running for the kato cli
   supervisord_wait
@@ -152,10 +156,6 @@ function roles_setup() {
   local cc_shared_dir_password="${7:?missing input}"
 
   local roles_array=($(echo $roles|tr "," " "))
-
-  message "info" "> Waiting for node to be ready"
-  node_ready.set_flag ".node_ready_flag"
-  node_ready.wait_flag ".node_ready_flag"
 
   message "info" ">> Running the pre-attachment setup"
 

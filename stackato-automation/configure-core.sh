@@ -22,6 +22,11 @@ message "info" "> Waiting for node to be ready"
 node_ready.set_flag ".node_ready_flag"
 node_ready.wait_flag ".node_ready_flag"
 
+# Wait for supervisord and check config_redis is running for the kato cli
+supervisord_wait
+supervisord_check_cli_exists
+supervisord_start_process "config_redis"
+
 roles_array=($(echo $roles|tr "," " "))
 
 message "info" "> Update the password of the stackato account"

@@ -19,8 +19,7 @@ service_autostart "apt-cacher-ng"
 service_mgnt "apt-cacher-ng" "start"
 
 message "info" "> Waiting for node to be ready"
-node_ready.set_flag ".node_ready_flag"
-node_ready.wait_flag ".node_ready_flag"
+wait_node_ready
 
 # Wait for supervisord and check config_redis is running for the kato cli
 supervisord_wait

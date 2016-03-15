@@ -20,7 +20,7 @@
 #
 variable os_region_name {
   description = "Region to deploy each node"
-  default = "region-b.geo-1"
+  default = "region1"
 }
 
 variable ssh_key_name {

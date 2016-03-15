@@ -65,7 +65,7 @@ variable dataservices {
 }
 
 variable controller {
-  description = "Configuration of the Cloud Controller nodes"
+  description = "Configuration of the additional Cloud Controller nodes"
   default = {
     count = 1
     roles = "controller"
@@ -74,7 +74,7 @@ variable controller {
 }
 
 variable router {
-  description = "Configuration of the Router nodes"
+  description = "Configuration of the additional Router nodes"
   default = {
     count = 1
     roles = "router"

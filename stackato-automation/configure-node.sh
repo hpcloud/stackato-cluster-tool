@@ -5,8 +5,8 @@
 # --cluster-hostname (e.g. myclusrer.com)
 # --roles (e.g. dea,controller)
 
-set -e
-#set -x
+set -e          # Exit if a command fails
+set -o pipefail # Exit if one command in a pipeline fails
 
 # Get and move to the current working directory
 CWD="$(dirname $0)" && cd $CWD
@@ -89,13 +89,13 @@ function main() {
   [ -z "$cluster_hostname" ] && message "error" "Missing parameter --cluster-hostname"
   [ -z "$roles" ] && message "error" "Missing parameter --roles"
 
-  system_setup "$core_ip" "$core_user" "$core_password" \
-    "/home/$node_user/.ssh/id_rsa.pub" "/home/$node_user/.ssh/authorized_keys"
-
   message "info" "> Waiting for node to be ready"
   wait_node_ready
 
-  # Wait for supervisord and check config_redis is running for the kato cli
+  system_setup "$core_ip" "$core_user" "$core_password" \
+    "/home/$node_user/.ssh/id_rsa.pub" "/home/$node_user/.ssh/authorized_keys"
+
+  message "info" "Start config_redis before using the kato cli"
   supervisord_wait
   supervisord_check_cli_exists
   supervisord_start_process "config_redis"
@@ -158,8 +158,8 @@ function roles_setup() {
 
   message "info" ">> Running the pre-attachment setup"
 
-  message "info" "> Remove all roles"
-  kato_node_remove "--all-but base primary"
+  # message "info" "> Remove all roles"
+  # kato_node_remove "--all-but base primary"
 
   if [[ "${roles_array[@]/controller}" != "${roles_array[@]}" ]]; then
     message "info" "> Setup of the controller"
@@ -170,11 +170,6 @@ function roles_setup() {
   if [[ "${roles_array[@]/router}" != "${roles_array[@]}" ]]; then
     message "info" "> Rename the router with $cluster_hostname"
     kato_node_rename "$cluster_hostname"
-  fi
-
-  if [[ "${roles_array[@]}" != "" ]]; then
-    message "info" "> Kato add roles"
-    kato_role_add ${roles_array[@]}
   fi
 }
 

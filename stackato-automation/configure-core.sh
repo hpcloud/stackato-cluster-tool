@@ -21,7 +21,7 @@ service_mgnt "apt-cacher-ng" "start"
 message "info" "> Waiting for node to be ready"
 wait_node_ready
 
-# Wait for supervisord and check config_redis is running for the kato cli
+message "info" "Start config_redis before using the kato cli"
 supervisord_wait
 supervisord_check_cli_exists
 supervisord_start_process "config_redis"
@@ -39,12 +39,12 @@ change_system_password "stackato" "$core_password"
 message "info" "> Disable SSH StrictHostKeyChecking (otherwise SSH will prompt for the check)"
 ssh_set_StrictHostKeyChecking "/home/stackato/.ssh/config" "10.0.*.*" "no"
 
-message "info" "> Setup the core node"
-kato_node_rename $cluster_hostname
-kato_node_setup_core $cluster_hostname
-
 # If controller role, configure it
 if [[ "${roles_array[@]/controller}" != "${roles_array[@]}" ]]; then
   message "info" "> Setup of the controller"
   controller_configure "$cc_shared_dir" "127.0.0.1" "$core_user" "${core_password}"
 fi
+
+message "info" "> Setup the core node"
+kato_node_rename $cluster_hostname
+kato_node_setup_core $cluster_hostname

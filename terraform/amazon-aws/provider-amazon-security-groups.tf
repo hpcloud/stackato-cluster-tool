@@ -33,7 +33,7 @@ resource "aws_security_group" "stackato_backend" {
       from_port = 0
       to_port = 0
       protocol = "-1"
-      cidr_blocks = ["${aws_subnet.public.cidr_block}"]
+      cidr_blocks = ["0.0.0.0/0"]
   }
 
   # Allow all egress traffic
@@ -41,7 +41,7 @@ resource "aws_security_group" "stackato_backend" {
       from_port = 0
       to_port = 0
       protocol = "-1"
-      cidr_blocks = ["${aws_subnet.public.cidr_block}"]
+      cidr_blocks = ["0.0.0.0/0"]
   }
 }
 

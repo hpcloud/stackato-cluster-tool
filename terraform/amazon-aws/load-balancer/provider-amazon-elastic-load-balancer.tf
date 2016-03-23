@@ -42,3 +42,8 @@ resource "aws_elb" "load_balance" {
   tags {
     Name = "${var.cluster_name}-elb"
   }
+}
+
+output "aws_load_balancer_dns_name" {
+  value = "${aws_elb.load_balance.dns_name}"
+}

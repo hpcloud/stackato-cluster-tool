@@ -18,5 +18,13 @@ variable "openstack_images" {
   description = "OpenStack images of Stackato 3.6.2"
   default = {
     region1        = "e5e45cd2-d4df-460e-a2ea-37bddecf8976" # MPC
+    RegionOne      = "7443c2f9-d681-4e20-964d-bfdca38600a5" # OSD (Vancouver)
+  }
+}
+
+variable "vsphere_templates" {
+  description = "vSphere templates of Stackato 3.6.2"
+  default = {
+    vcenter.stackato.com = "stackato-release/stackato-v362"
   }
 }

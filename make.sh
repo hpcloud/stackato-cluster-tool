@@ -2,8 +2,8 @@
 set -e # Exit on error
 
 # Constants
-CWD="$(readlink -f $(dirname $0))"; cd $CWD
-PLATFORM_SUPPORT=(openstack amazon-aws)          # Supported platforms by this tool
+CWD="$(cd $(dirname $0) && pwd)"        # Script directory
+PLATFORM_SUPPORT=(openstack amazon-aws) # Supported platforms by this tool
 
 # Default configuration
 PLATFORM_DEFAULT="openstack"

@@ -26,6 +26,9 @@ cd out
 Use the option -lb to add the load balance configuration.
 
 Then:
+
+Note: For Stackato developer, prefix the name of your cluster with "developer-" in order to be able to upload a server certificate for the ELB.
+
 - Choose your cluster configuration in config.tf. The name of the cluster (key cluster_name) will be asked while launching Terraform
 - Choose your Amazon configuration in config-amazon.tf, especially aws_access_key and aws_secret_key. Check the Amazon documentation http://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSGettingStartedGuide/AWSCredentials.html to get those two keys.
 - Make sure you uploaded your public SSH key (see doc: http://docs.aws.amazon.com/gettingstarted/latest/wah/getting-started-prereq.html#create-a-key-pair) and update the variable `ssh_key_name` in config-amazon.tf

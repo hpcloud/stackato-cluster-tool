@@ -192,7 +192,7 @@ In order to provide a production-like environment, the cluster tool with also co
 |   protocol | port         |   source                  |  *reason*             |
 |------------|--------------|---------------------------|-----------------------|
 |    TCP     |  9022        | [controller](#controller) | droplets?             |
-|    TCP*    |  41000-61000 | [router](#router)         | harbor?               |
+|    TCP     |  41000-61000 | [router](#router)         | router app access     |
 |    UDP*    |  41000-61000 | [router](#router)         | harbor?               |
 \* *Possibly just if using harbor*
 ##### outbound

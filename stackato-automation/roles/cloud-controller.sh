@@ -12,16 +12,18 @@ function controller_configure() {
   # New location of the Cloud controller data (could be a bigger disk)
   local controller_mount_dir="${CONTROLLER_MOUNT_DIR:=/mnt/controller}"
 
-  # SSHFS mount options
-  local SSHFS_OPTS=( idmap=user
-                     reconnect
-                     allow_other
-                     ServerAliveInterval=15 )
-
   local stackato_user="${STACKATO_USER:=stackato}"
   local stackato_group="${STACKATO_GROUP:=stackato}"
   local fuse_conf_path="${FUSE_CONF_PATH:=/etc/fuse.conf}"
   local ssh_pubkey_path="${SSH_PUBKEY_PATH:-/home/stackato/.ssh/id_rsa.pub}"
+
+  # SSHFS mount options
+  local SSHFS_OPTS=( IdentityFile=/home/${stackato_user}/.ssh/id_rsa
+                     delay_connect
+                     idmap=user
+                     reconnect
+                     allow_other
+                     ServerAliveInterval=15 )
 
   controller_make_new_environment ${controller_mount_dir} ${stackato_user} ${stackato_group}
 

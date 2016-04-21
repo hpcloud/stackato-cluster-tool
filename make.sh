@@ -18,7 +18,7 @@ MSG_INTERNAL_UNKNOWN_MSG_TYPE="Internal error: unknown message type %s\n"
 MSG_TERRAFORM_CONFIG_COPY_DONE="Terraform config copied for %s for %s:\n"
 
 # Print the usage
-function usage(){
+function usage() {
   >&2 echo "
   usage: $0 [OPTIONS] [-p | --platform PLATFORM] [-v | --version VERSION]
 
@@ -85,6 +85,7 @@ function copy_terraform_config() {
     find $platform_dir/* -maxdepth 0 -type f \( -name "*.tf" -or -name "*.tpl" \) -exec cp {} $output_dir \;
     # Copy the Terraform file targetting a specific version of Stackato
     cp $version_dir $output_dir/var-stackato-version.tf
+    cp $(dirname $version_dir)/var-ubuntu-images.tf $output_dir/var-ubuntu-images.tf
 
     cp $common_tf_dir/* $output_dir       # Copy the common Terraform files
     cp -r $provisioner_dir $output_dir    # Copy the provisioner scripts

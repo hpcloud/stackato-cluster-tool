@@ -17,29 +17,15 @@ resource "aws_instance" "core" {
   # Give a name to the node
   tags { Name = "${var.cluster_name}-core-${format("%03d", count.index + 1)}" }
   # The VPC Subnet ID to launch in and security group
-  subnet_id = "${aws_subnet.public.id}"
+  subnet_id = "${aws_subnet.private.id}"
   vpc_security_group_ids = [ "${aws_security_group.stackato_endpoints.id}" ]
   # Provision the node
-  # user_data = "PROVISIONER_BIN_URL=${var.provisioner_bin_url}; ROLES=${lookup(var.core, "roles")}; HOSTNAME=${var.cluster_hostname}; PASSWORDLESSSUDO=${lookup(var.core, "passwordlesssudo")}; ${file("provisioner-cloudinit")}"
   user_data = "${template_file.core.rendered}"
-
-  # Setup the provisioner connection with the Core node
-  connection {
-      user = "stackato"
-      password = "${var.core_password}"
-  }
-
-  # Copies the myapp.conf file to /etc/myapp.conf
-  provisioner "file" {
-    source = "stackato-automation"
-    destination = "/opt/"
-  }
 }
 
 resource "aws_instance" "dea" {
   # Launch the instance after the VPC and the Core node
-  depends_on = [ "aws_internet_gateway.gw", "aws_vpc.main", "aws_subnet.private",
-    "aws_instance.core" ]
+  depends_on = [ "aws_internet_gateway.gw", "aws_vpc.main", "aws_instance.core" ]
   # Amount of nodes
   count = "${lookup(var.dea, "count")}"
   # Launch the instance
@@ -57,8 +43,7 @@ resource "aws_instance" "dea" {
 
 resource "aws_instance" "dataservices" {
   # Launch the instance after the VPC and the Core node
-  depends_on = [ "aws_internet_gateway.gw", "aws_vpc.main", "aws_subnet.private",
-    "aws_instance.core" ]
+  depends_on = [ "aws_internet_gateway.gw", "aws_vpc.main", "aws_instance.core" ]
   # Amount of nodes
   count = "${lookup(var.dataservices, "count")}"
   # Launch the instance
@@ -76,8 +61,7 @@ resource "aws_instance" "dataservices" {
 
 resource "aws_instance" "controller" {
   # Launch the instance after the VPC and the Core node
-  depends_on = [ "aws_internet_gateway.gw", "aws_vpc.main", "aws_subnet.private",
-    "aws_instance.core" ]
+  depends_on = [ "aws_internet_gateway.gw", "aws_vpc.main", "aws_instance.core" ]
   # Amount of nodes
   count = "${lookup(var.controller, "count")}"
   # Launch the instance
@@ -95,8 +79,7 @@ resource "aws_instance" "controller" {
 
 resource "aws_instance" "router" {
   # Launch the instance after the VPC and the Core node
-  depends_on = [ "aws_internet_gateway.gw", "aws_vpc.main", "aws_subnet.public",
-    "aws_instance.core" ]
+  depends_on = [ "aws_internet_gateway.gw", "aws_vpc.main", "aws_instance.core" ]
   # Amount of nodes
   count = "${lookup(var.router, "count")}"
   # Launch the instance
@@ -106,7 +89,7 @@ resource "aws_instance" "router" {
   # Give a name to the node
   tags { Name = "${var.cluster_name}-router-${format("%03d", count.index + 1)}" }
   # The VPC Subnet ID to launch in
-  subnet_id = "${aws_subnet.public.id}"
+  subnet_id = "${aws_subnet.private.id}"
   vpc_security_group_ids = [ "${aws_security_group.stackato_endpoints.id}" ]
   # Provision the node
   user_data = "${template_file.router.rendered}"

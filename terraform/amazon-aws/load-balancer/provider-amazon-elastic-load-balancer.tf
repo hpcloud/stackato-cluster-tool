@@ -31,9 +31,9 @@ resource "aws_elb" "load_balance" {
     interval = 30
   }
 
-  subnets = [ "${aws_subnet.public.id}" ]
+  subnets = [ "${aws_subnet.private.id}" ]
   security_groups = [ "${aws_security_group.stackato_endpoints.id}" ]
-  instances = ["${aws_instance.core.id}", "${aws_instance.router.*.id}"]
+  instances = ["${aws_instance.core.*.id}", "${aws_instance.router.*.id}"]
   cross_zone_load_balancing = true
   idle_timeout = 400
   connection_draining = true

@@ -41,7 +41,7 @@ function sshfs_mount() {
     fstab_opts_string="${fstab_opts_string#,}"
   fi
 
-  local fstab="$source $target_path fuse.sshfs,$fstab_opts_string  defaults,_netdev  0  0"
+  local fstab="$source $target_path fuse.sshfs defaults,_netdev,${fstab_opts_string}  0  0"
 
   run_as "$user" "sshfs $sshfs_opts_string $source $target_path"
   sshfs_add_fstab "$fstab"

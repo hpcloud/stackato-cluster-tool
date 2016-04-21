@@ -43,3 +43,20 @@ function ssh_copy_ssh_key() {
 
   cat $pubkey_path | sshpass -p "${password}" ssh -o StrictHostKeyChecking=no ${user}@${ip} 'cat >> .ssh/authorized_keys'
 }
+
+function ssh_add_match() {
+  local ssh_config="${1:?missing input}"
+  local match_filter="${2:?missing input}"
+
+  if ! grep --quiet "Match $match_filter $ssh_config"; then
+    sed -i -e "\$aMatch $match_filter" $ssh_config
+  fi
+}
+
+function ssh_add_match_option() {
+  local ssh_config="${1:?missing input}"
+  local match_filter="${2:?missing input}"
+  local option="${3:?missing input}"
+
+  sed -i "s/^Match ${match_filter}.*/&\n\t${option}/" $ssh_config
+}

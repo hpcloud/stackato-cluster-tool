@@ -26,13 +26,20 @@ variable ssh_key_name {
   default = "stefan-win-key"
 }
 
+variable ssh_key_path {
+  description = "Path of the private key linked to ssh_key_name (used for uploading scripts)"
+  default= "~/.ssh/id_rsa"
+}
+
+# EC2 instance types:  https://aws.amazon.com/ec2/instance-types/
 variable aws_instance_type {
   description = "AWS EC2 instance type for each node type"
   default = {
-    "core" = "t2.medium"
-    "dea" = "t2.medium"
+    "core"         = "t2.medium"
+    "dea"          = "t2.medium"
     "dataservices" = "t2.medium"
-    "controller" = "t2.medium"
-    "router" = "t2.medium"
+    "controller"   = "t2.medium"
+    "router"       = "t2.medium"
+    "proxy"        = "t2.micro"
   }
 }

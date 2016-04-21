@@ -1,0 +1,28 @@
+# This file only needs to list configuration variables that deviate
+# from the default values.  See /usr/share/doc/polipo/examples/config.sample
+# and "polipo -v" for variables you can tweak and further information.
+# Doc: https://github.com/jech/polipo/blob/master/config.sample
+
+logSyslog = true
+logFile = /var/log/polipo/polipo.log
+
+proxyAddress = "::0"          # both IPv4 and IPv6
+# proxyAddress = "0.0.0.0"    # IPv4 only
+proxyPort = 8123              # The TCP port on which the proxy listens
+
+dnsQueryIPv6 = no
+disableVia = false
+diskCacheRoot = ""
+allowedPorts = 1-65535
+
+chunkHighMark = 104857600
+objectHighMark = 16384
+
+disableServersList = false
+dnsUseGethostbyname = happily
+maxAge = 0
+maxAgeFraction = 0
+maxExpiresAge = 0
+maxNoModifiedAge = 0
+relaxTransparency = maybe
+# allowedClients = 127.0.0.1, 10.0.0.0/16

@@ -1,0 +1,41 @@
+providers:
+  aws:
+    access_key: ""
+    secret_key: ""
+    key_name: stefan-win-key
+
+images:
+  - version: 3.6.2
+    providers:
+      aws:
+        us-west-2: ami-7d5fb21d   # Oregon
+        us-west-1: ami-ca98e8aa   # Northern California
+
+      azure:
+        us-west-2: hpe-helion-stackato-362
+
+cluster:
+  name: stefan
+  
+  properties:
+    cluster_hostname: stefan.com
+    core_password: stackato
+
+  nodes:
+    - name: core
+      count: 1
+      roles: core,controller
+      providers:
+        - name: aws
+          regions: [ us-west-2 ]
+          subnet: aws_subnet_private
+          security_group: stackato_endpoints
+
+    - name: dea
+      count: 1
+      roles: dea
+      providers:
+        - name: aws
+          regions: [ us-west-2 ]
+          subnet: aws_subnet_private
+          security_group: stackato_endpoints

@@ -48,7 +48,7 @@ function ssh_add_match() {
   local ssh_config="${1:?missing input}"
   local match_filter="${2:?missing input}"
 
-  if ! grep --quiet "Match $match_filter $ssh_config"; then
+  if ! grep --quiet "Match $match_filter" $ssh_config; then
     sed -i -e "\$aMatch $match_filter" $ssh_config
   fi
 }

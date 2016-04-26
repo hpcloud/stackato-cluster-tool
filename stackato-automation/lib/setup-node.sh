@@ -9,7 +9,7 @@
 #
 function setup_node() {
   ########## Parse parameters ##########
-  while true; do
+  while [ $# -gt 0 ]; do
     case "$1" in
       -c | --core-ip           ) shift; core_ip="$1";                  shift;; # Required
       -u | --core-user         ) shift; core_user="$1";                shift;;
@@ -270,10 +270,12 @@ function roles_post_attach_setup() {
   fi
 
   # Configure router
-  if [[ "${roles_array[@]/router}" != "${roles_array[@]}" ]]; then
+  if [[ "${roles_array[@]/router}" != "${roles_array[@]}" || 
+        "${roles_array[@]/core}"   != "${roles_array[@]}" ]]; then
     message "info" "> Setup the router"
     router_properties "$(declare -p router_properties)"
     router_configure_acl "$router_acl_rules"
     router_configure_acl_drop_conn "$router_acl_drop_conn"
+    kato_role_restart router
   fi
 }

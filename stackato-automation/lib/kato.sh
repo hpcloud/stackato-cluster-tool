@@ -46,6 +46,12 @@ function kato_role_add() {
   done
 }
 
+function kato_role_restart() {
+  local roles="${@:?missing input}" # Space-separated list of roles
+
+  run_as "stackato" "$KATO_BIN restart ${roles//,/ }"
+}
+
 function kato_set_upstream_proxy() {
   local proxy_ip="${1:?undefined input}"
   local proxy_port="${2:?undefined input}"

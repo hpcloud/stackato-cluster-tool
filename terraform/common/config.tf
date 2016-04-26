@@ -1,8 +1,8 @@
 # This file configure the cluster at the  Stackato level.
-# The configuration at the providers level are in files "provider-*-config.tf".
+# The configuration at the providers level is in the file "config-PROVIDER.tf".
 #
 # cluster_hostname: you can give the domain you want then setup a wildcard
-# dns server *.yourdomain.com or add in your host file the following lines
+# dns server *.yourdomain.com or add in your host file the following lines:
 #   ip_of_the_endpoint yourdomain.com
 #   ip_of_the_endpoint api.yourdomain.com
 #   ip_of_the_endpoint aok.yourdomain.com
@@ -13,10 +13,9 @@
 #   "count": amount of the node type to deploy
 #   "roles": comma-separated list of Stackato roles to assign to the node type
 #            (e.g. "dea,data-services")
-#   "visibility": "public" to be accessible from internet, or "private"
-#   "ssh_key_name": the ssh key name already imported on Amazon AWS
-#   "passwordlesssudo": enable sudo without password
 
+# Note: For Stackato developer, the name has to start with "developer-" in order
+# to have the right to upload the Amazon load balancer certificate
 variable cluster_name {
   description = "Name of the cluster"
   default = "stefan"
@@ -37,7 +36,6 @@ variable core {
   default = {
     count = 1
     roles = "core,controller"
-    visibility = "public"
   }
 }
 
@@ -46,7 +44,6 @@ variable dea {
   default = {
     count = 3
     roles = "dea"
-    visibility = "private"
   }
 }
 
@@ -55,7 +52,6 @@ variable dataservices {
   default = {
     count = 1
     roles = "data-services"
-    visibility = "private"
   }
 }
 
@@ -64,7 +60,6 @@ variable controller {
   default = {
     count = 1
     roles = "controller"
-    visibility = "private"
   }
 }
 
@@ -73,7 +68,6 @@ variable router {
   default = {
     count = 1
     roles = "router"
-    visibility = "public"
   }
 }
 

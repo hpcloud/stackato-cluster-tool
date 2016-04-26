@@ -10,7 +10,9 @@
 #   x_frame_options
 # The value will not be set for undefined keys.
 # See http://docs.stackato.com/admin/server/router.html#settings for properties
+#TODO: IMPROVEMENT - find a solution to avoid unsetting nounset
 function router_properties() {
+  set +o nounset  # Unset nounset because of the eval
   eval "local -A properties=""${1#*=}"
 
   local -a valid_properties=( client_inactivity_timeout backend_inactivity_timeout
@@ -21,12 +23,13 @@ function router_properties() {
       kato_config_set "router2g $p" "${properties[$p]}"
     fi
   done
+  set -o nounset
 }
 
 # acl_rules: set to "none" if no rules
 function router_configure_acl() {
-  local acl_rules="${1}"
-  if [ ! -z "$acl_rules" -o "$acl_rules" != "none" ]; then
+  local acl_rules="${1:-none}"
+  if [ ! -z "$acl_rules" -a "$acl_rules" != "none" ]; then
     kato_config_set "router2g acl/enabled" "true"
     kato_config_set "router2g acl/rules" "${acl_rules}"
   fi
@@ -36,7 +39,7 @@ function router_configure_acl_drop_conn() {
   local drop_conn="${1:-true}"
   if [ ! -z "${drop_conn}" ]; then
     case $drop_conn in
-      true|false) kato_config_set "router2g acl/use_x_forwarded_for" "true" ;;
+      true|false) kato_config_set "router2g acl/use_x_forwarded_for" "$drop_conn" ;;
       *) message "error" "Unknown ACL drop_conn value $drop_conn (should be true or false)" ;;
     esac
   fi

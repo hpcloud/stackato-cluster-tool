@@ -5,8 +5,9 @@
 # --cluster-hostname (e.g. myclusrer.com)
 # --roles (e.g. dea,controller)
 
-set -e          # Exit if a command fails
+set -o errexit  # Exit if a command fails
 set -o pipefail # Exit if one command in a pipeline fails
+set -o nounset  # Treat  unset  variables and parameters as errors
 
 # Get and move to the current working directory
 CWD="$(dirname $0)" && cd $CWD

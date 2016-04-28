@@ -3,13 +3,13 @@
 
 resource "null_resource" "core" {
   triggers = {
-    private_ip = "${element(aws_instance.core.*.private_ip, 0)}"
+    private_ip = "${element(concat(aws_instance.core.*.private_ip, aws_spot_instance_request.core.*.private_ip), 0)}"
   }
 }
 
 resource "null_resource" "proxy" {
   triggers = {
-    private_ip = "${element(aws_instance.proxy.*.private_ip, 0)}"
+    private_ip = "${element(concat(aws_instance.proxy.*.private_ip, aws_spot_instance_request.proxy.*.private_ip), 0)}"
     public_ip  = "${element(aws_instance.proxy.*.public_ip, 0)}"
     apt_proxy  = "${element(aws_instance.proxy.*.private_ip, 0)}"
   }

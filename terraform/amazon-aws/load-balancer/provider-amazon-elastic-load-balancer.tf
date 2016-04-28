@@ -33,7 +33,7 @@ resource "aws_elb" "load_balance" {
 
   subnets = [ "${aws_subnet.private.id}" ]
   security_groups = [ "${aws_security_group.stackato_endpoints.id}" ]
-  instances = ["${aws_instance.core.*.id}", "${aws_instance.router.*.id}"]
+  instances = [ "${concat(aws_instance.core.*.id, aws_instance.router.*.id, aws_spot_instance_request.core.*.spot_instance_id ,aws_spot_instance_request.router.*.spot_instance_id)}" ]
   cross_zone_load_balancing = true
   idle_timeout = 400
   connection_draining = true

@@ -18,7 +18,7 @@
 # to have the right to upload the Amazon load balancer certificate
 variable cluster_name {
   description = "Name of the cluster"
-  default = "stefan"
+  default = "developer-stefan"
 }
 
 variable cluster_hostname {

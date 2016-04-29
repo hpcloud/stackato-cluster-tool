@@ -90,6 +90,7 @@ In order to provide a production-like environment, the cluster tool with also co
 |    TCP     |  22           | [all-stackato](#all-stackato)  | SSH             |
 |    TCP     |  80           | all hosts                      | HTTP            |
 |    TCP     |  443          | all hosts                      | HTTPS           |
+|    TCP     |  4222         | [primary](#primary)            | NATS            |
 |    TCP     |  5454         | [data-service](#data-service)  | redis-services? |
 |    TCP     |  6379         | [primary](#primary)            | ephemeral redis |
 |    TCP     |  6464         | [primary](#primary)            | applog redis    |
@@ -97,22 +98,22 @@ In order to provide a production-like environment, the cluster tool with also co
 |    TCP     |  7474         | [primary](#primary)            | config-redis    |
 |    TCP     |  9001         | [all-stackato](#all-stackato)  | supervisord     |
 
-\* *We should test outbound restriction of ports 80 and 443 to only the '[all-stackato](#all-stackato)' group and the proxy-server IP, instead of 'all hosts'*
+\* *For proxied environments, customers will instead have outbound rules on ports 80 and 443 to [all-stackato](#all-stackato) and [upstream-proxy](#upstream-proxy)
 
 ---
 #### `primary`
 *Group for only core/primary node*
 ##### inbound
-|   protocol | port    |   source                        |  *reason*       |
-|------------|---------|---------------------------------|-----------------|
-|    TCP     |  80     | [all-stackato](#all-stackato)   | HTTP            |
-|    TCP     |  80     | [load-balancer](#load-balancer) | HTTP            |
-|    TCP     |  443    | [all-stackato](#all-stackato)   | HTTPS           |
-|    TCP     |  443    | [load-balancer](#load-balancer) | HTTPS           |
-|    TCP     |  4222   | all nodes                       | NATS            |
-|    TCP     |  6379   | [primary](#primary)             | ephemeral redis |
-|    TCP     |  6464   | [all-stackato](#all-stackato)   | applog redis    |
-|    TCP     |  7474   | [primary](#primary)             | config-redis    |   
+|   protocol | port    |   source                            |  *reason*       |
+|------------|---------|-------------------------------------|-----------------|
+|    TCP     |  80     | [router](#router)                   | HTTP            |
+|    TCP     |  443    | [router](#router)                   | HTTPS           |
+|    TCP     |  4222   | [all-stackato](#all-stackato)       | NATS            |
+|    TCP*    |  4567   | [router](#router)                   | NATS or AOK ?   |
+|    TCP     |  6379   | [router](#router) and/or [dea](#dea)| ephemeral redis |
+|    TCP     |  6464   | [all-stackato](#all-stackato)       | applog redis    |
+|    TCP     |  7474   | [all-stackato](#all-stackato)       | config-redis    |  
+\**cannot stackato login without this*
 ---
 #### `data-service`
 *Group for all nodes which have any data service role (rabbit, mysql, postgres, mongodb, redis, or filesystem)*
@@ -131,10 +132,11 @@ In order to provide a production-like environment, the cluster tool with also co
 |   protocol | port    |   source          |  *reason*             |
 |------------|---------|-------------------|-----------------------|
 |    TCP     |  8181   | [DEA](#dea)       | droplet upload server |
-|    TCP     |  8181   | [router](#router) | droplet upload server |
+|    TCP*    |  8181   | [router](#router) | droplet upload server |
 |    TCP     |  9022   | [DEA](#dea)       | droplets?             |
 |    TCP     |  9025   | [router](#router) | stackato-rest?        |
 |    TCP     |  9026   | [router](#router) | stackato-rest?        |
+\**if disallowed, proxied API requests from router do not work*
 ##### outbound
 |   protocol | port    |   destination             |  *reason*      |
 |------------|---------|---------------------------|----------------|
@@ -146,24 +148,26 @@ In order to provide a production-like environment, the cluster tool with also co
 #### `router`
 *Group for all nodes with router role*
 ##### inbound
-|   protocol | port          |   source                        |  *reason*             |
-|------------|---------------|---------------------------------|-----------------------|
-|    TCP     |  22           | [load-balancer](#load-balancer) | SSH                   |
-|    TCP     |  80           | [load-balancer](#load-balancer) | HTTP                  |
-|    TCP     |  443          | [load-balancer](#load-balancer) | HTTPS                 |
-|    TCP*    |  41000-61000  | [load-balancer](#load-balancer) | harbor                |
-|    UDP*    |  41000-61000  | [load-balancer](#load-balancer) | harbor                |
+|   protocol | port          |   source                        |  *reason*   |
+|------------|---------------|---------------------------------|-------------|
+|    TCP     |  22           | [load-balancer](#load-balancer) | SSH         |
+|    TCP     |  80           | [load-balancer](#load-balancer) | HTTP        |
+|    TCP     |  443          | [load-balancer](#load-balancer) | HTTPS       |
+|    TCP*    |  41000-61000  | [load-balancer](#load-balancer) | harbor      |
+|    UDP*    |  41000-61000  | [load-balancer](#load-balancer) | harbor      |
 \**If using Harbor only*
 ##### outbound
 |   protocol | port         |   destination             |  *reason*             |
 |------------|--------------|---------------------------|-----------------------|
-|    TCP     |  8181        | [controller](#controller) | droplet upload server |
+|    TCP     |  4567        | [primary](#primary)       | NATS or AOK ?         |
+|    TCP*    |  8181        | [controller](#controller) | droplet upload server |
 |    TCP     |  9001        | [controller](#controller) | droplet upload server |
 |    TCP     |  9025        | [controller](#controller) | stackato-rest?        |
 |    TCP     |  9026        | [controller](#controller) | stackato-rest?        |
 |    TCP     |  41000-61000 | [controller](#controller) | health manager        |
-|    UDP*    |  41000-61000 | [controller](#controller) | harbor                |
-\**If using Harbor only*
+|    UDP**   |  41000-61000 | [controller](#controller) | harbor                |
+\**If disallowed, proxied API requests from router do not work. Don't ask me why*
+\*\**If using Harbor only*
 #### `load-balancer`
 *Group for the load balancer. If using the Stackato load balancer, this should group should be applied along with the '[all-stackato](#all-stackato)' group*
 ##### inbound
@@ -237,4 +241,3 @@ In order to provide a production-like environment, the cluster tool with also co
 `<NONE>`
 
 ---
-

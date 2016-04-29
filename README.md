@@ -98,7 +98,7 @@ In order to provide a production-like environment, the cluster tool with also co
 |    TCP     |  7474         | [primary](#primary)            | config-redis    |
 |    TCP     |  9001         | [all-stackato](#all-stackato)  | supervisord     |
 
-\* *For proxied environments, customers will instead have outbound rules on ports 80 and 443 to [all-stackato](#all-stackato) and [upstream-proxy](#upstream-proxy)
+\* *For proxied environments, customers will instead have outbound rules on ports 80 and 443 to [all-stackato](#all-stackato) and [upstream-proxy](#upstream-proxy)*
 
 ---
 #### `primary`
@@ -113,7 +113,8 @@ In order to provide a production-like environment, the cluster tool with also co
 |    TCP     |  6379   | [router](#router) and/or [dea](#dea)| ephemeral redis |
 |    TCP     |  6464   | [all-stackato](#all-stackato)       | applog redis    |
 |    TCP     |  7474   | [all-stackato](#all-stackato)       | config-redis    |  
-\**cannot stackato login without this*
+\* *cannot stackato login without this*
+
 ---
 #### `data-service`
 *Group for all nodes which have any data service role (rabbit, mysql, postgres, mongodb, redis, or filesystem)*
@@ -136,7 +137,7 @@ In order to provide a production-like environment, the cluster tool with also co
 |    TCP     |  9022   | [DEA](#dea)       | droplets?             |
 |    TCP     |  9025   | [router](#router) | stackato-rest?        |
 |    TCP     |  9026   | [router](#router) | stackato-rest?        |
-\**if disallowed, proxied API requests from router do not work*
+\* *if disallowed, proxied API requests from router do not work*
 ##### outbound
 |   protocol | port    |   destination             |  *reason*      |
 |------------|---------|---------------------------|----------------|
@@ -155,7 +156,7 @@ In order to provide a production-like environment, the cluster tool with also co
 |    TCP     |  443          | [load-balancer](#load-balancer) | HTTPS       |
 |    TCP*    |  41000-61000  | [load-balancer](#load-balancer) | harbor      |
 |    UDP*    |  41000-61000  | [load-balancer](#load-balancer) | harbor      |
-\**If using Harbor only*
+\* *If using Harbor only*
 ##### outbound
 |   protocol | port         |   destination             |  *reason*             |
 |------------|--------------|---------------------------|-----------------------|
@@ -166,8 +167,8 @@ In order to provide a production-like environment, the cluster tool with also co
 |    TCP     |  9026        | [controller](#controller) | stackato-rest?        |
 |    TCP     |  41000-61000 | [controller](#controller) | health manager        |
 |    UDP**   |  41000-61000 | [controller](#controller) | harbor                |
-\**If disallowed, proxied API requests from router do not work. Don't ask me why*
-\*\**If using Harbor only*
+\* *If disallowed, proxied API requests from router do not work. Don't ask me why*  
+\*\* *If using Harbor only*
 #### `load-balancer`
 *Group for the load balancer. If using the Stackato load balancer, this should group should be applied along with the '[all-stackato](#all-stackato)' group*
 ##### inbound
@@ -178,7 +179,7 @@ In order to provide a production-like environment, the cluster tool with also co
 |    TCP     |  443          | [load-balancer](#load-balancer) | HTTPS                 |
 |    TCP*    |  41000-61000  | [load-balancer](#load-balancer) | harbor                |
 |    UDP*    |  41000-61000  | [load-balancer](#load-balancer) | harbor                |
-\**If using Harbor only*
+\* *If using Harbor only*
 ##### outbound
 |   protocol | port         |   destination             |  *reason*             |
 |------------|--------------|---------------------------|-----------------------|
@@ -187,7 +188,7 @@ In order to provide a production-like environment, the cluster tool with also co
 |    TCP     |  9026        | [controller](#controller) | stackato-rest         |
 |    TCP*    |  41000-61000 | [controller](#controller) | health manager        |
 |    UDP*    |  41000-61000 | [controller](#controller) | harbor                |
-\**If using Harbor only*
+\* *If using Harbor only*
 
 ---
 #### `DEA`

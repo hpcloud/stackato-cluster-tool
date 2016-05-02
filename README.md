@@ -20,10 +20,9 @@ On Windows: bash -c "./make.sh --help"
 ###### For an Amazon cluster
 Create the basic configuration:
 ```
-make.sh -p amazon-aws [-lb]
+make.sh -p amazon-aws -lb
 cd out
 ```
-Use the option -lb to add the load balance configuration.
 
 Then:
 

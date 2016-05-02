@@ -1,4 +1,4 @@
-**Does not work**: This Vagrant file can start any types of cluster in Vagrant in a NAT network which means that each node has two network interface which breaks Stackato.
+**Does not work**: This Vagrant file can start any type of cluster in Vagrant in a NAT network which means that each node has two network interface which breaks Stackato.
 
 ## 1. Make the Stackato Vagrant box
 

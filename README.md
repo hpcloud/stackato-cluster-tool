@@ -46,10 +46,6 @@ cd out
 
 
 ##### 3. Start your cluster
-Return to the main directory for the tool.
-```
-cd ..
-```
 
 Confirm that your cluster creation plan is valid before actually building it
 ```

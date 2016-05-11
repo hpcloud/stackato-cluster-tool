@@ -2,7 +2,7 @@
 provider "vsphere" {
   user           = "stefanb"
   password       = "yourpassword"
-  vsphere_server = "vcenter.stackato.com"
+  vsphere_server = "vcenter.yourdomain.com"
 }
 
 variable vsphere_node_memory {

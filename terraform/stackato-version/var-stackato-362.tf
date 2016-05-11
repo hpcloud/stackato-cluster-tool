@@ -25,6 +25,6 @@ variable "openstack_images" {
 variable "vsphere_templates" {
   description = "vSphere templates of Stackato 3.6.2"
   default = {
-    vcenter.stackato.com = "stackato-release/stackato-v362"
+    vcenter.yourdomain.com = "stackato-release/stackato-v362"
   }
 }

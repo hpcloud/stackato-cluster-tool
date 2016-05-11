@@ -1,5 +1,5 @@
 ## stackato-cluster-tool
-*Assists in the rapid provisioning a Stackato cluster on Amazon AWS, OpenStack or Vagrant\*.*
+*Assists in the rapid provisioning a Stackato cluster on Amazon AWS, OpenStack or Vagrant*.*
 
 ---
 

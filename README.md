@@ -17,7 +17,7 @@ On Linux: ./make.sh --help
 On Windows: bash -c "./make.sh --help"
 ```
 
-###### For an Amazon cluster
+###### 2.1. For an Amazon cluster
 Create the basic configuration:
 ```
 make.sh -p amazon-aws -lb
@@ -33,7 +33,7 @@ Note: For Stackato developer, prefix the name of your cluster with "developer-" 
 - Make sure you uploaded your public SSH key (see doc: http://docs.aws.amazon.com/gettingstarted/latest/wah/getting-started-prereq.html#create-a-key-pair) and update the variable `ssh_key_name` in config-amazon.tf
 - If using the load balancer option, your ssl certificate and key should be in the `out` folder and the keys `certificate_path` and `private_key_path` must be updated in `config.tf`.
 
-###### For an OpenStack cluster
+###### 2.2. For an OpenStack cluster
 Create the basic configuration:
 ```
 make.sh -p openstack
@@ -55,8 +55,6 @@ Tips: you can follow the provisioning progress on each node from the file `/var/
 
 ##### 4. Modify a running cluster
 You can update the configuration file config.tf then run `terraform plan` and `terraform apply` again.
-
-**/!\ OpenStack: A bug in the Terraform security group plugin prevents Terraform 0.6.9 to update an existing cluster (Terraform delete and recreate an updated security group that is already attached to an instance). The fix of the bug is in progress: https://github.com/hashicorp/terraform/issues/4714**
 
 ##### 5. Destroy a cluster
 Run the command `terraform destroy` and type 'yes'.

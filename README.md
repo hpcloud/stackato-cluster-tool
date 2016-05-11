@@ -18,10 +18,9 @@ https://terraform.io/downloads.html
 ##### 2. Configuring your Stackato cluster
 _Check out the latest stable release:_
 
----
-`git checkout v0.8.0`
-
----
+```
+git checkout v0.8.0
+```
 
 
 

@@ -37,13 +37,13 @@ cd out
 - If using the load balancer option, your ssl certificate and key should be in the `out` folder and the keys `certificate_path` and `private_key_path` must be updated in `config.tf`.
 
 ###### 2.2. OpenStack
-Create the basic configuration:
+Create the initial configuration:
 ```
 ./make.sh -p openstack
 cd out
 ```
 - Edit config.tf to configure and name your cluster. 
-- Edit config-openstack.tf to configure our Openstack particulars.
+- Edit config-openstack.tf to configure your Openstack particulars.
 
 
 ##### 3. Start your cluster

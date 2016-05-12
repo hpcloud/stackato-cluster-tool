@@ -31,6 +31,7 @@ variable ssh_key_name {
 variable openstack_flavor_name {
   description = "OpenStack flavor ID for each node type"
   default = {
+    proxy = "standard.large"
     core = "standard.large"
     dea = "standard.large"
     dataservices = "standard.large"

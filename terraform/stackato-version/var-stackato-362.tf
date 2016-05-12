@@ -17,8 +17,8 @@ variable "amazon_images" {
 variable "openstack_images" {
   description = "OpenStack images of Stackato 3.6.2"
   default = {
-    region1        = "e5e45cd2-d4df-460e-a2ea-37bddecf8976" # MPC
-    RegionOne      = "7443c2f9-d681-4e20-964d-bfdca38600a5" # OSD (Vancouver)
+    RegionOne      = "7443c2f9-d681-4e20-964d-bfdca38600a5"
+    region1        = "890c451f-028e-47d3-a00a-e3e4ff716dc0"
   }
 }
 

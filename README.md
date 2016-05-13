@@ -110,6 +110,7 @@ In order to provide a production-like environment, the cluster tool with also co
 |    TCP     |  443    | [router](#router)                   | HTTPS           |
 |    TCP     |  4222   | [all-stackato](#all-stackato)       | NATS            |
 |    TCP*    |  4567   | [router](#router)                   | NATS or AOK ?   |
+|    TCP     |  5432   | [controller](#controller)           | cc postgres db  |
 |    TCP     |  6379   | [router](#router) and/or [dea](#dea)| ephemeral redis |
 |    TCP     |  6464   | [all-stackato](#all-stackato)       | applog redis    |
 |    TCP     |  7474   | [all-stackato](#all-stackato)       | config-redis    |  
@@ -143,6 +144,7 @@ In order to provide a production-like environment, the cluster tool with also co
 |------------|---------|---------------------------|----------------|
 |    TCP     |  3306   | [mysql](#mysql)           | mysql node     |
 |    TCP     |  5432   | [postgreSQL](#postgresql) | postgreSQL     |
+|    TCP     |  5432   | [controller](#controller) | cc postgres db |
 |    TCP     |  9022   | [DEA](#dea)               | droplets?      |
 |    TCP     |  9025   | [controller](#controller) | stackato-rest? |
 ---

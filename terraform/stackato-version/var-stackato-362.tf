@@ -14,6 +14,8 @@ variable "amazon_images" {
   }
 }
 
+# Get the list of images with the command:
+# openstack image list
 variable "openstack_images" {
   description = "OpenStack images of Stackato 3.6.2"
   default = {

@@ -13,6 +13,8 @@ variable "amazon_ubuntu_images" {
   }
 }
 
+# Get the list of images with the command:
+# openstack image list
 variable "openstack_ubuntu_images" {
   description = "OpenStack images of Ubuntu 14.04 LTS"
   default = {

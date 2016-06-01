@@ -9,43 +9,37 @@
 #
 function usage() {
   >&2 echo "
-    $0 BASE_CLUSTER_CONFIG [OPTIONS]
+      -c | --core-ip           : IP address of the core node (used 127.0.0.1 when running on the Core node
+      -u | --core-user         :
+      -p | --core-password     :
+      -n | --node-user         :
+      -h | --cluster-hostname  :
+      -r | --roles             :
 
-    BASE_CLUSTER_CONFIG:
+      --mbus-ip                :
+      --mbus-port              :
 
-    -c | --core-ip           IP address of the core node (e.g. 10.0.0.1)
-    -e | --cluster-hostname  Endpoint hostname of the cluster (e.g. mycluster.com)
-    -r | --roles             Comma-separated list of Stackato roles
+      --start-apt-cacher       :
 
-    OPTIONS:
+      --use-proxy              :
+      --http-proxy             :
+      --http-proxy-port        :
+      --https-proxy-port       :
+      --apt-proxy              :
+      --apt-http-proxy-port    :
+      --apt-https-proxy-port   :
 
-    -u | --core-user         Username to SSH into the Core node (default: stackato)
-    -p | --core-password     Password to SSH into the Core node (default: stackato)
-    -n | --node-user         Stackato node user (default: --core-user)
+      --cc-shared-dir          :
+      --cc-shared-dir-ip       :
+      --cc-shared-dir-user     :
+      --cc-shared-dir-password :
 
-    --mbus-ip                IP address of the MBUS server (default: --core-ip)
-    --mbus-port              Port of the MBUS server (default: 4222)
+      --router-acl-rules       :
+      --router-acl-drop-conn   :
 
-    --start-apt-cacher       Start APT Cacher on the node (default: false)
+      -d | --debug   ) set -x; shift ;;
+      -h | --help    ) usage ; exit 1 ;;
 
-    --use-proxy              Use a proxy on the node
-    --http-proxy             HTTP/HTTPS proxy IP (required if --use-proxy)
-    --http-proxy-port        HTTP proxy port (default: 8123)
-    --https-proxy-port       HTTPS proxy port (default: --http-proxy-port)
-    --apt-proxy              APT proxy IP (default: --http-proxy)
-    --apt-http-proxy-port    APT HTTP proxy port (default: 3142)
-    --apt-https-proxy-port   APT HTTPS proxy port (default: --https-proxy-port)
-
-    --cc-shared-dir          Shared Cloud Controller (CC) directory path (default: /mnt/controller)
-    --cc-shared-dir-ip       IP to connect to the shared CC directory IP (default: --core-ip)
-    --cc-shared-dir-user     User to connect to the shared CC directory (default: --core-user)
-    --cc-shared-dir-password Password to connect to the shared CC directory (default: --core-password)
-
-    --router-acl-rules       Router Access Control List (ACL) rules (default: none)
-    --router-acl-drop-conn   Drop connection to minimize snooping or DoS (default: true)
-
-    -d | --debug             Run in debug mode
-    -h | --help              Print this message
   "
 }
 
@@ -53,33 +47,31 @@ function setup_node() {
   ########## Parse parameters ##########
   while [ $# -gt 0 ]; do
     case "$1" in
-      -c | --core-ip           ) shift; local core_ip="$1";                shift;; # Required
-      -u | --core-user         ) shift; local core_user="$1";              shift;;
-      -p | --core-password     ) shift; local core_password="$1";          shift;;
-      -n | --node-user         ) shift; local node_user="$1";              shift;;
-      -e | --cluster-hostname  ) shift; local cluster_hostname="$1";       shift;; # Required
-      -r | --roles             ) shift; local roles="$1";                  shift;; # Required
+      -c | --core-ip           ) shift; core_ip="$1";                  shift;; # Required
+      -u | --core-user         ) shift; core_user="$1";                shift;;
+      -p | --core-password     ) shift; core_password="$1";            shift;;
+      -n | --node-user         ) shift; node_user="$1";                shift;;
+      -h | --cluster-hostname  ) shift; cluster_hostname="$1";         shift;; # Required
+      -r | --roles             ) shift; roles="$1";                    shift;; # Required
 
-      --mbus-ip                ) shift; local mbus_ip="$1";                shift;;
-      --mbus-port              ) shift; local mbus_port="$1";              shift;;
+      --mbus-ip                ) shift; mbus_ip="$1";                  shift;;
+      --mbus-port              ) shift; mbus_port="$1";                shift;;
 
-      --start-apt-cacher       ) shift; local start_apt_cacher="true";     shift;;
+      --start-apt-cacher       ) shift; start_apt_cacher="true";       shift;;
 
-      --use-proxy              ) shift; local use_proxy="true";;
-      --http-proxy             ) shift; local http_proxy="$1";             shift;;
-      --http-proxy-port        ) shift; local http_proxy_port="$1";        shift;;
-      --https-proxy-port       ) shift; local https_proxy_port="$1";       shift;;
-      --apt-proxy              ) shift; local apt_proxy="$1";              shift;;
-      --apt-http-proxy-port    ) shift; local apt_http_proxy_port="$1";    shift;;
-      --apt-https-proxy-port   ) shift; local apt_https_proxy_port="$1";   shift;;
+      --use-proxy              ) shift; use_proxy="true";;
+      --http-proxy             ) shift; http_proxy="$1";               shift;;
+      --https-proxy            ) shift; https_proxy="$1";               shift;;
+      --apt-http-proxy         ) shift; apt_http_proxy="$1";           shift;;
+      --apt-https-proxy        ) shift; apt_https_proxy="$1";          shift;;
 
-      --cc-shared-dir          ) shift; local cc_shared_dir="$1";          shift;;
-      --cc-shared-dir-ip       ) shift; local cc_shared_dir_ip="$1";       shift;;
-      --cc-shared-dir-user     ) shift; local cc_shared_dir_user="$1";     shift;;
-      --cc-shared-dir-password ) shift; local cc_shared_dir_password="$1"; shift;;
+      --cc-shared-dir          ) shift; cc_shared_dir="$1";            shift;;
+      --cc-shared-dir-ip       ) shift; cc_shared_dir_ip="$1";         shift;;
+      --cc-shared-dir-user     ) shift; cc_shared_dir_user="$1";       shift;;
+      --cc-shared-dir-password ) shift; cc_shared_dir_password="$1";   shift;;
 
-      --router-acl-rules       ) shift; local router_acl_rules="$1";       shift;;
-      --router-acl-drop-conn   ) shift; local router_acl_drop_conn="$1";   shift;;
+      --router-acl-rules       ) shift; router_acl_rules="$1";         shift;;
+      --router-acl-drop-conn   ) shift; router_acl_drop_conn="$1";     shift;;
 
       -d | --debug   ) set -x; shift ;;
       -h | --help    ) usage ; exit 1 ;;
@@ -89,7 +81,6 @@ function setup_node() {
     esac
   done
 
-  [ "$#" -eq 0 ]             && usage; exit 1
   [ -z "$core_ip" ]          && message "error" "Missing parameter --core-ip"
   [ -z "$cluster_hostname" ] && message "error" "Missing parameter --cluster-hostname"
   [ -z "$roles" ]            && message "error" "Missing parameter --roles"
@@ -106,13 +97,13 @@ function setup_node() {
 
   # Proxy settings
   local use_proxy="${use_proxy:-false}"
-  local http_proxy="${http_proxy}"
-  local http_proxy_port="${http_proxy_port:-8123}"
-  local https_proxy_port="${https_proxy_port:-$http_proxy_port}"
+  if [ "$use_proxy" == "true" ]; then
+    local http_proxy="${http_proxy:?missing input}"
+    local https_proxy="${https_proxy:-$http_proxy}"
 
-  local apt_proxy="${apt_proxy:-$http_proxy}"
-  local apt_http_proxy_port="${apt_http_proxy_port:-3142}"
-  local apt_https_proxy_port="${apt_https_proxy_port:-$http_proxy_port}" # Polipo because Apt cacher too old for https
+    local apt_http_proxy="${apt_http_proxy:-$http_proxy}"
+    local apt_https_proxy="${apt_https_proxy_port:-$https_proxy}" # Polipo because Apt cacher too old for https
+  fi
 
   # Cloud Controller settings
   local cc_shared_dir="${cc_shared_dir:-/mnt/controller}"
@@ -149,10 +140,10 @@ function setup_node() {
   if [ "$use_proxy" == "true" ]; then
     message "info" "> Set APT and HTTP proxy"
     [ -z "$http_proxy" ] && message "error" "Missing parameter --http-proxy"
-    set_apt_proxy "$apt_proxy" "$apt_http_proxy_port" "$apt_https_proxy_port"
-    get_http_proxy_envvars "$http_proxy" "$http_proxy_port" "$https_proxy_port" >> /home/stackato/.bashrc
-    get_http_proxy_envvars "$http_proxy" "$http_proxy_port" "$https_proxy_port" >> /etc/default/docker
-    kato_set_upstream_proxy "$http_proxy" "$http_proxy_port"
+    set_apt_proxy "$apt_http_proxy" "$apt_https_proxy"
+    get_http_proxy_envvars "$http_proxy" "$https_proxy" >> /home/stackato/.bashrc
+    get_http_proxy_envvars "$http_proxy" "$https_proxy" >> /etc/default/docker
+    kato_set_upstream_proxy "$http_proxy"
   fi
 
   roles_setup "$roles" "$core_ip" "$cluster_hostname" \
@@ -162,7 +153,7 @@ function setup_node() {
     node_attach "$core_ip" "$roles" "$mbus_ip" "$mbus_port"
   fi
 
-  roles_post_attach_setup "$roles" "$use_proxy" "$http_proxy" "$http_proxy_port" \
+  roles_post_attach_setup "$roles" "$use_proxy" "$http_proxy" "$https_proxy"\
     "$(declare -p ROUTER_PROPERTIES)" "$router_acl_rules" "$router_acl_drop_conn"
 }
 
@@ -296,7 +287,7 @@ function roles_post_attach_setup() {
   local roles="${1:?missing input}"
   local use_proxy="${2:?missing input}"
   local http_proxy="${3:?missing input}"
-  local http_proxy_port="${4:?missing input}"
+  local https_proxy="${4:?missing input}"
 
   eval "local -A router_properties=""${5#*=}"
   local router_acl_rules="${6:?missing input}"
@@ -308,8 +299,8 @@ function roles_post_attach_setup() {
 
   if [ "$use_proxy" == "true" ]; then
     message "info" "> Setup Apps HTTP Proxy"
-    kato_config_set "dea_ng environment/app_http_proxy"  "http://${http_proxy}:${http_proxy_port}"
-    kato_config_set "dea_ng environment/app_https_proxy" "http://${http_proxy}:${http_proxy_port}"
+    kato_config_set "dea_ng environment/app_http_proxy"  "${http_proxy}"
+    kato_config_set "dea_ng environment/app_https_proxy" "${https_proxy}"
   fi
 
   # Configure router

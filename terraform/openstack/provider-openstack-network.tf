@@ -12,6 +12,7 @@ resource "openstack_networking_subnet_v2" "public" {
   network_id = "${openstack_networking_network_v2.main.id}"
   cidr = "10.0.1.0/24"
   enable_dhcp = true
+  # dns_nameservers = [ "1.2.3.4", "1.2.3.5" ] # Add your static DNS servers
 }
 
 # Create a private subnet to host private hosts

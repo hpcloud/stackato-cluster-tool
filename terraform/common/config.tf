@@ -42,7 +42,7 @@ variable core {
 variable dea {
   description = "Configuration of the DEA nodes"
   default = {
-    count = 3
+    count = 2
     roles = "dea"
   }
 }
@@ -85,10 +85,17 @@ variable proxy {
     admin_user           = "ubuntu"
     count                = 1      # Start a proxy node. Set to 0 to disable
     use_proxy            = "true" # Configure the proxy on Stackato nodes
-    http_proxy_port      = "8123"
-    https_proxy_port     = "8123"
-    apt_http_proxy_port  = "3142"
-    apt_https_proxy_port = "8123" # APT Cacher does not support HTTPS
+    http_proxy_port      = "8123" # HTTP proxy port to setup on the proxy node
+    https_proxy_port     = "8123" # HTTPS proxy port to setup on the proxy node
+    apt_http_proxy_port  = "3142" # APT HTTP port to setup on the apt cacher server on the proxy node
+    apt_https_proxy_port = "8123" # APT HTTPS port to use. (APT Cacher does not support HTTPS so using the HTTPS proxy one)
+
+    http_upstream_proxy  = "" # If different than empty, the proxy node will connect to it for HTTP/HTTPS requests
+    apt_upstream_proxy   = "" # If different than empty, the proxy node will connect to it for APT requests
+    http_proxy           = "" # If different than empty, nodes will connect to it for HTTP requests
+    https_proxy          = "" # If different than empty, nodes will connect to it for HTTPS requests
+    apt_http_proxy       = "" # If different than empty, nodes will connect to it for APT HTTP requests
+    apt_https_proxy      = "" # If different than empty, nodes will connect to it for APT HTTPS requests
   }
 }
 

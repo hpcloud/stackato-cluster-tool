@@ -7,5 +7,5 @@ output "ssh_core_ip" {
 }
 
 output "ssh_core_access" {
-  value = "ssh -o ProxyCommand='ssh -W %h:%p ${lookup(var.proxy, "admin_user")}@${null_resource.proxy.triggers.public_ip}' stackato@${null_resource.core.triggers.private_ip}"
+  value = "ssh -o ProxyCommand='ssh -W %h:%p ${lookup(var.proxy, "admin_user")}@${null_resource.provisioner_repo.triggers.public_ip}' stackato@${null_resource.core.triggers.private_ip}"
 }

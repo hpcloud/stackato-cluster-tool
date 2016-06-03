@@ -1,6 +1,6 @@
 resource "openstack_compute_instance_v2" "proxy" {
   # Launch the instance after the subnet is up
-  depends_on = [ "openstack_networking_subnet_v2.public" ]
+  depends_on = [ "openstack_networking_subnet_v2.main" ]
   region = "${var.os_region_name}"
   count = "${lookup(var.proxy, "count")}"
 
@@ -15,7 +15,7 @@ resource "openstack_compute_instance_v2" "proxy" {
   }
   # floating_ip = "${element(openstack_compute_floatingip_v2.floatips.*.address, count.index)}"
   floating_ip = "${openstack_compute_floatingip_v2.floatips.address}"
-  scheduler_hints { build_near_host_ip="${openstack_networking_subnet_v2.public.cidr}" }
+  scheduler_hints { build_near_host_ip="${openstack_networking_subnet_v2.main.cidr}" }
   user_data = "${template_file.proxy.rendered}"
 
   # Setup the provisioner connection with the Core node

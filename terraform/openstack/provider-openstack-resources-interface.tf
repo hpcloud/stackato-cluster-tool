@@ -29,6 +29,6 @@ resource "null_resource" "provisioner_repo" {
 # Dynamic variables about the network
 resource "null_resource" "network" {
   triggers = {
-    cidr_block = "${openstack_networking_subnet_v2.public.cidr}"
+    cidr_block = "${openstack_networking_subnet_v2.main.cidr}"
   }
 }

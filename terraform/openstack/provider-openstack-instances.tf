@@ -1,5 +1,5 @@
 resource "openstack_compute_instance_v2" "core" {
-  depends_on = [ "openstack_networking_subnet_v2.public" ]
+  depends_on = [ "openstack_networking_subnet_v2.main" ]
   region = "${var.os_region_name}"
   # Amount of nodes
   # count = "${lookup(var.core, "count")}"
@@ -14,12 +14,12 @@ resource "openstack_compute_instance_v2" "core" {
     uuid="${openstack_networking_network_v2.main.id}"
     name="${openstack_networking_network_v2.main.name}"
   }
-  scheduler_hints { build_near_host_ip="${openstack_networking_subnet_v2.public.cidr}" }
+  scheduler_hints { build_near_host_ip="${openstack_networking_subnet_v2.main.cidr}" }
   user_data = "${template_file.core.rendered}"
 }
 
 resource "openstack_compute_instance_v2" "dea" {
-  depends_on = [ "openstack_networking_subnet_v2.public" ]
+  depends_on = [ "openstack_networking_subnet_v2.main" ]
   region = "${var.os_region_name}"
   # Amount of nodes
   count = "${lookup(var.dea, "count")}"
@@ -33,12 +33,12 @@ resource "openstack_compute_instance_v2" "dea" {
     uuid="${openstack_networking_network_v2.main.id}"
     name="${openstack_networking_network_v2.main.name}"
   }
-  scheduler_hints { build_near_host_ip="${openstack_networking_subnet_v2.public.cidr}" }
+  scheduler_hints { build_near_host_ip="${openstack_networking_subnet_v2.main.cidr}" }
   user_data = "${template_file.dea.rendered}"
 }
 
 resource "openstack_compute_instance_v2" "dataservices" {
-  depends_on = [ "openstack_networking_subnet_v2.public" ]
+  depends_on = [ "openstack_networking_subnet_v2.main" ]
   region = "${var.os_region_name}"
   # Amount of nodes
   count = "${lookup(var.dataservices, "count")}"
@@ -52,12 +52,12 @@ resource "openstack_compute_instance_v2" "dataservices" {
     uuid="${openstack_networking_network_v2.main.id}"
     name="${openstack_networking_network_v2.main.name}"
   }
-  scheduler_hints { build_near_host_ip="${openstack_networking_subnet_v2.public.cidr}" }
+  scheduler_hints { build_near_host_ip="${openstack_networking_subnet_v2.main.cidr}" }
   user_data = "${template_file.dataservices.rendered}"
 }
 
 resource "openstack_compute_instance_v2" "controller" {
-  depends_on = [ "openstack_networking_subnet_v2.public" ]
+  depends_on = [ "openstack_networking_subnet_v2.main" ]
   region = "${var.os_region_name}"
   # Amount of nodes
   count = "${lookup(var.controller, "count")}"
@@ -71,12 +71,12 @@ resource "openstack_compute_instance_v2" "controller" {
     uuid="${openstack_networking_network_v2.main.id}"
     name="${openstack_networking_network_v2.main.name}"
   }
-  scheduler_hints { build_near_host_ip="${openstack_networking_subnet_v2.public.cidr}" }
+  scheduler_hints { build_near_host_ip="${openstack_networking_subnet_v2.main.cidr}" }
   user_data = "${template_file.controller.rendered}"
 }
 
 resource "openstack_compute_instance_v2" "router" {
-  depends_on = [ "openstack_networking_subnet_v2.public" ]
+  depends_on = [ "openstack_networking_subnet_v2.main" ]
   region = "${var.os_region_name}"
   # Amount of nodes
   count = "${lookup(var.router, "count")}"
@@ -90,6 +90,6 @@ resource "openstack_compute_instance_v2" "router" {
     uuid="${openstack_networking_network_v2.main.id}"
     name="${openstack_networking_network_v2.main.name}"
   }
-  scheduler_hints { build_near_host_ip="${openstack_networking_subnet_v2.public.cidr}" }
+  scheduler_hints { build_near_host_ip="${openstack_networking_subnet_v2.main.cidr}" }
   user_data = "${template_file.router.rendered}"
 }

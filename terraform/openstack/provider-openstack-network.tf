@@ -6,7 +6,7 @@ resource "openstack_networking_network_v2" "main" {
 }
 
 # Create a public subnet to host public facing nodes
-resource "openstack_networking_subnet_v2" "public" {
+resource "openstack_networking_subnet_v2" "main" {
   name = "${var.cluster_name}-subnet-public"
   region = "${var.os_region_name}"
   network_id = "${openstack_networking_network_v2.main.id}"
@@ -36,7 +36,7 @@ resource "openstack_networking_router_v2" "router" {
 resource "openstack_networking_router_interface_v2" "router_interface_1" {
   region = "${var.os_region_name}"
   router_id = "${openstack_networking_router_v2.router.id}"
-  subnet_id = "${openstack_networking_subnet_v2.public.id}"
+  subnet_id = "${openstack_networking_subnet_v2.main.id}"
 }
 
 # Create floating IPs for public facing nodes

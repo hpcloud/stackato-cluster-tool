@@ -1,61 +1,70 @@
-# stackato-cluster-tool
-Terraform a Stackato cluster on Amazon AWS and OpenStack.
+## stackato-cluster-tool
+*Assists in the rapid provisioning of Stackato clusters on Amazon AWS, OpenStack or Vagrant*.*
 
-Note: For Vagrant, see the folder `vagrant/`.
+---
+
+**\*Note:** *Vagrant support is currently rudimentary. Please see vagrant/README for more information.*
+
+---
+
+**Requirements:**
+
+1. Terraform
+2. Valid Account and keys for your cloud provider
 
 ##### 1. Install Terraform
 https://terraform.io/downloads.html
 
-##### 2. Setup your Stackato cluster with make.sh
+##### 2. Configuring your Stackato cluster
+_Check out the latest stable release:_
 
-Checkout the latest release:
-`git checkout v0.8.0`
-
-Print the help of make.sh:
 ```
-On Linux: ./make.sh --help
-On Windows: bash -c "./make.sh --help"
+git checkout v0.8.0
 ```
 
-###### 2.1. For an Amazon cluster
-Create the basic configuration:
+
+
+###### 2.1. Amazon AWS
+Create the initial configuration:
 ```
-make.sh -p amazon-aws -lb
+./make.sh -p amazon-aws -lb
 cd out
 ```
 
-Then:
-
-Note: For Stackato developer, prefix the name of your cluster with "developer-" in order to be able to upload a server certificate for the ELB.
-
-- Choose your cluster configuration in config.tf. The name of the cluster (key cluster_name) will be asked while launching Terraform
-- Choose your Amazon configuration in config-amazon.tf, especially aws_access_key and aws_secret_key. Check the Amazon documentation http://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSGettingStartedGuide/AWSCredentials.html to get those two keys.
-- Make sure you uploaded your public SSH key (see doc: http://docs.aws.amazon.com/gettingstarted/latest/wah/getting-started-prereq.html#create-a-key-pair) and update the variable `ssh_key_name` in config-amazon.tf
+- Edit config.tf to configure and name your cluster. 
+- Edit config-amazon.tf to configure your Amazon AWS particulars such as your access and ssh keys, spot or on-demand instances, as well as regions.
 - If using the load balancer option, your ssl certificate and key should be in the `out` folder and the keys `certificate_path` and `private_key_path` must be updated in `config.tf`.
 
-###### 2.2. For an OpenStack cluster
-Create the basic configuration:
+###### 2.2. OpenStack
+Create the initial configuration:
 ```
-make.sh -p openstack
+./make.sh -p openstack
 cd out
 ```
-Then:
-- Choose your cluster configuration in config.tf. The name of the cluster (key cluster_name) will be asked while launching Terraform
-- Choose your OpenStack configuration in config-openstack.tf
-- Make sure you uploaded your public SSH key (see doc: http://docs.openstack.org/user-guide/configure_access_and_security_for_instances.html#import-a-key-pair) and update the variable `ssh_key_name` in config-openstack.tf
-- if you need to setup static DNS servers, comment out and setup the line "dns_nameservers" in the file provider-openstack-network.tf
 
-##### 3. Start the cluster
-In a terminal, move to the root directory containing the Terraform files.
+- Edit config.tf to configure and name your cluster. 
+- Edit config-openstack.tf to configure your Openstack particulars.
+- If you need to setup static DNS servers, comment out and setup the line "dns_nameservers" in the file provider-openstack-network.tf
 
-Check that the configuration from step 2 is valid by running `terraform plan`.
+##### 3. Start your cluster
 
-Start the cluster by running `terraform apply`.
+Confirm that your cluster creation plan is valid before actually building it
+```
+terraform plan
+```
+If the plan is successful then start your cluster.
+```
+terraform apply
+```
 
-Tips: you can follow the provisioning progress on each node from the file `/var/log/cloud-init-output.log`.
+*Tip: you can follow the provisioning progress on each node from `/var/log/cloud-init-output.log`.*
 
 ##### 4. Modify a running cluster
-You can update the configuration file config.tf then run `terraform plan` and `terraform apply` again.
+Changes made to the cluster configuration file `config.tf` can be tested and then deployed by running the commands listed in step 3.
 
 ##### 5. Destroy a cluster
-Run the command `terraform destroy` and type 'yes'.
+To destroy your cluster, run
+```
+terraform destroy
+```
+and enter`yes` when prompted.

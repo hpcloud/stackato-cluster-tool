@@ -1,50 +1,46 @@
 # Setup a Stackato node
-#
-#   Required parameters:
-#     --core-ip: ip of the Core node
-#     --cluster-hostname: hostname of the cluster (e.g. mycluster.com)
-#     --roles: comma-separated list of roles (e.g. dea,controller)
-#
-#   Optional parameters: check in the function
-#
 function usage() {
   >&2 echo "
+      $0 OPTIONS
+
+      Required options:
+
       -c | --core-ip           : IP address of the core node (used 127.0.0.1 when running on the Core node
-      -u | --core-user         :
-      -p | --core-password     :
-      -n | --node-user         :
-      -h | --cluster-hostname  :
-      -r | --roles             :
+      -h | --cluster-hostname  : Stackato cluster hostname (e.g. mycluster.com)
+      -r | --roles             : comma-separated list of Stackato roles
 
-      --mbus-ip                :
-      --mbus-port              :
+      Optional options:
 
-      --start-apt-cacher       :
+      -u | --core-user         : Username to SSH on the core node
+      -p | --core-password     : Password to SSH on the core node
+      -n | --node-user         : Stackato username
 
-      --use-proxy              :
-      --http-proxy             :
-      --http-proxy-port        :
-      --https-proxy-port       :
-      --apt-proxy              :
-      --apt-http-proxy-port    :
-      --apt-https-proxy-port   :
+      --mbus-ip                : IP of the mbus server
+      --mbus-port              : Port of the mbus server
 
-      --cc-shared-dir          :
-      --cc-shared-dir-ip       :
-      --cc-shared-dir-user     :
-      --cc-shared-dir-password :
+      --start-apt-cacher       : Start an APT cacher on the node
 
-      --router-acl-rules       :
-      --router-acl-drop-conn   :
+      --use-proxy              : Use an HTTP/HTTPS proxy on the node
+      --http-proxy             : Address of the HTTP proxy server
+      --https-proxy            : Address of the HTTPS proxy server
+      --apt-http-proxy         : Address of the APT proxy server for HTTP requests
+      --apt-https-proxy        : Address of the APT proxy server for HTTPS requests
 
-      -d | --debug   ) set -x; shift ;;
-      -h | --help    ) usage ; exit 1 ;;
+      --cc-shared-dir          : Path of the shared directory between Cloud Controller
+      --cc-shared-dir-ip       : IP of the server hosting the shared directory
+      --cc-shared-dir-user     : User to connect to the shared directory
+      --cc-shared-dir-password : Password to connect to the shared directory
 
+      --router-acl-rules       : Stackato router ACL rules
+      --router-acl-drop-conn   : Stacakto router ACL drop connection
+
+      -d | --debug             : Run this script in debug mode
+      -h | --help              : Print thie help message
   "
 }
 
 function setup_node() {
-  ########## Parse parameters ##########
+  ########################## Parse parameters ##################################
   while [ $# -gt 0 ]; do
     case "$1" in
       -c | --core-ip           ) shift; core_ip="$1";                  shift;; # Required
@@ -81,11 +77,11 @@ function setup_node() {
     esac
   done
 
-  [ -z "$core_ip" ]          && message "error" "Missing parameter --core-ip"
-  [ -z "$cluster_hostname" ] && message "error" "Missing parameter --cluster-hostname"
-  [ -z "$roles" ]            && message "error" "Missing parameter --roles"
+  [ -z "${core_ip:-}" ]          && message "error" "Missing parameter --core-ip. See $0 --help"
+  [ -z "${cluster_hostname:-}" ] && message "error" "Missing parameter --cluster-hostname. See $0 --help"
+  [ -z "${roles:-}" ]            && message "error" "Missing parameter --roles. See $0 --help"
 
-  ########## Set the default values ##########
+  ####################### Set the default values ###############################
   local core_user="${core_user:-stackato}"
   local core_password="${core_password:-stackato}"
   local node_user="${node_user:-$core_user}"
@@ -116,7 +112,8 @@ function setup_node() {
   local router_acl_rules="${router_acl_rules:-none}"
   local router_acl_drop_conn="${router_acl_drop_conn:-true}"
 
-  ########## Start provisioning ##########
+  ############################ Start provisioning ##############################
+  ##############################################################################
   fstab_cleanup
   sudo_set_passwordless "$node_user" "ALL=(ALL) NOPASSWD:ALL"
 
@@ -139,7 +136,7 @@ function setup_node() {
 
   if [ "$use_proxy" == "true" ]; then
     message "info" "> Set APT and HTTP proxy"
-    [ -z "$http_proxy" ] && message "error" "Missing parameter --http-proxy"
+    [ -z "$http_proxy" ] && message "error" "Missing parameter --http-proxy. See $0 --help"
     set_apt_proxy "$apt_http_proxy" "$apt_https_proxy"
     get_http_proxy_envvars "$http_proxy" "$https_proxy" >> /home/stackato/.bashrc
     get_http_proxy_envvars "$http_proxy" "$https_proxy" >> /etc/default/docker
@@ -150,6 +147,9 @@ function setup_node() {
     "$cc_shared_dir" "$cc_shared_dir_ip" "$cc_shared_dir_user" "$cc_shared_dir_password"
 
   if [ "${roles#core}" == "${roles}" ]; then
+    message "info" "> Pre-attachment setup"
+    roles_pre_attach_setup "$core_ip" "$core_user" "$roles"
+    message "info" "> Attach node"
     node_attach "$core_ip" "$roles" "$mbus_ip" "$mbus_port"
   fi
 
@@ -233,25 +233,25 @@ function roles_setup() {
 
   local roles_array=($(echo $roles|tr "," " "))
 
-  message "info" "> Running the pre-attachment setup"
+  message "info" "> Setting up Stackato roles"
 
   # message "info" "> Remove all roles"
   # kato_node_remove "--all-but base primary"
 
   if [[ "${roles_array[@]/core}" != "${roles_array[@]}" ]]; then
-    message "info" ">> Setup the core node"
+    message "info" "- Setup the core node"
     kato_node_rename $cluster_hostname
     kato_node_setup_core $cluster_hostname
   fi
 
   if [[ "${roles_array[@]/controller}" != "${roles_array[@]}" ]]; then
-    message "info" ">> Setup of the controller"
+    message "info" "- Setup of the controller"
     controller_configure "$cc_shared_dir" "$cc_shared_dir_ip" \
         "$cc_shared_dir_user" "$cc_shared_dir_password"
   fi
 
   if [[ "${roles_array[@]/router}" != "${roles_array[@]}" ]]; then
-    message "info" ">> Rename the router with $cluster_hostname"
+    message "info" "- Rename the router with $cluster_hostname"
     kato_node_rename "$cluster_hostname"
   fi
 }
@@ -272,8 +272,25 @@ function node_attach() {
   message "info" "> Waiting for MBUS before attaching the node"
   mbus_wait_ready "$mbus_ip" "$mbus_port"
 
-  message "info" ">> Attach the node to the core"
+  message "info" "> Attaching the node to the core node on $core_ip"
   kato_node_attach "$core_ip" "$roles"
+}
+
+# Setup a Stackato node before attaching it to the the Core node
+#   @core_ip: ip address of the Core node
+#   @core_user: username of the Core node
+#   @roles: comma-separated list of roles to enable in the node
+function roles_pre_attach_setup() {
+  local core_ip="${1:?missing input}"
+  local core_user="${2:?missing input}"
+  local roles="${3:?missing input}"
+
+  local roles_array=($(echo $roles|tr "," " "))
+
+  if [[ "${roles_array[@]/router}" != "${roles_array[@]}" ]]; then
+    # Copy the private SSL key from the core into the router
+    ssl_copy_remote_private_key "$core_user" "$core_ip" "stackato.key"
+  fi
 }
 
 # Setup a Stackato node after it was attached to the Core node
@@ -295,10 +312,10 @@ function roles_post_attach_setup() {
 
   local roles_array=($(echo $roles|tr "," " "))
 
-  message "info" ">> Postattachment setup"
+  message "info" "> Postattachment setup"
 
   if [ "$use_proxy" == "true" ]; then
-    message "info" "> Setup Apps HTTP Proxy"
+    message "info" "- Setup Apps HTTP Proxy"
     kato_config_set "dea_ng environment/app_http_proxy"  "${http_proxy}"
     kato_config_set "dea_ng environment/app_https_proxy" "${https_proxy}"
   fi
@@ -306,7 +323,7 @@ function roles_post_attach_setup() {
   # Configure router
   if [[ "${roles_array[@]/router}" != "${roles_array[@]}" ||
         "${roles_array[@]/core}"   != "${roles_array[@]}" ]]; then
-    message "info" "> Setup the router"
+    message "info" "- Setup the router"
     router_properties "$(declare -p router_properties)"
     router_configure_acl "$router_acl_rules"
     router_configure_acl_drop_conn "$router_acl_drop_conn"

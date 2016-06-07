@@ -4,7 +4,7 @@
 # Dynamic variable about the core node
 resource "null_resource" "core" {
   triggers = {
-    private_ip = "${openstack_compute_instance_v2.core.access_ip_v4}"
+    private_ip = "${openstack_compute_instance_v2.core.network.0.fixed_ip_v4}"
   }
 }
 

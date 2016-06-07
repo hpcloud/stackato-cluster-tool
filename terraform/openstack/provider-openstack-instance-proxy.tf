@@ -14,7 +14,7 @@ resource "openstack_compute_instance_v2" "proxy" {
     name="${openstack_networking_network_v2.main.name}"
   }
   # floating_ip = "${element(openstack_compute_floatingip_v2.floatips.*.address, count.index)}"
-  floating_ip = "${openstack_compute_floatingip_v2.floatips.address}"
+  floating_ip = "${openstack_compute_floatingip_v2.floatips_proxy.address}"
   scheduler_hints { build_near_host_ip="${openstack_networking_subnet_v2.main.cidr}" }
   user_data = "${template_file.proxy.rendered}"
 

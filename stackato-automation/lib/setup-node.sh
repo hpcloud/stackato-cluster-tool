@@ -129,19 +129,19 @@ function setup_node() {
   system_setup "$roles" "$core_ip" "$core_user" "$core_password" \
     "/home/$node_user/.ssh/id_rsa.pub" "/home/$node_user/.ssh/authorized_keys"
 
-  message "info" "Start config_redis before using the kato cli"
-  supervisord_wait
-  supervisord_check_cli_exists
-  supervisord_start_process "config_redis"
-
   if [ "$use_proxy" == "true" ]; then
     message "info" "> Set APT and HTTP proxy"
     [ -z "$http_proxy" ] && message "error" "Missing parameter --http-proxy. See $0 --help"
     set_apt_proxy "$apt_http_proxy" "$apt_https_proxy"
     get_http_proxy_envvars "$http_proxy" "$https_proxy" >> /home/stackato/.bashrc
     get_http_proxy_envvars "$http_proxy" "$https_proxy" >> /etc/default/docker
-    kato_set_upstream_proxy "$http_proxy"
+    service_mgnt "docker" "restart"
   fi
+
+  message "info" "Start config_redis before using the kato cli"
+  supervisord_wait
+  supervisord_check_cli_exists
+  supervisord_start_process "config_redis"
 
   roles_setup "$roles" "$core_ip" "$cluster_hostname" \
     "$cc_shared_dir" "$cc_shared_dir_ip" "$cc_shared_dir_user" "$cc_shared_dir_password"
@@ -239,19 +239,19 @@ function roles_setup() {
   # kato_node_remove "--all-but base primary"
 
   if [[ "${roles_array[@]/core}" != "${roles_array[@]}" ]]; then
-    message "info" "- Setup the core node"
+    message "info" "* Setup the core node"
     kato_node_rename $cluster_hostname
     kato_node_setup_core $cluster_hostname
   fi
 
   if [[ "${roles_array[@]/controller}" != "${roles_array[@]}" ]]; then
-    message "info" "- Setup of the controller"
+    message "info" "* Setup of the controller"
     controller_configure "$cc_shared_dir" "$cc_shared_dir_ip" \
         "$cc_shared_dir_user" "$cc_shared_dir_password"
   fi
 
   if [[ "${roles_array[@]/router}" != "${roles_array[@]}" ]]; then
-    message "info" "- Rename the router with $cluster_hostname"
+    message "info" "* Rename the router with $cluster_hostname"
     kato_node_rename "$cluster_hostname"
   fi
 }
@@ -315,15 +315,16 @@ function roles_post_attach_setup() {
   message "info" "> Postattachment setup"
 
   if [ "$use_proxy" == "true" ]; then
-    message "info" "- Setup Apps HTTP Proxy"
+    message "info" "* Setup Apps HTTP/HTTPS Proxy"
     kato_config_set "dea_ng environment/app_http_proxy"  "${http_proxy}"
     kato_config_set "dea_ng environment/app_https_proxy" "${https_proxy}"
+    kato_set_upstream_proxy "$http_proxy"
   fi
 
   # Configure router
   if [[ "${roles_array[@]/router}" != "${roles_array[@]}" ||
         "${roles_array[@]/core}"   != "${roles_array[@]}" ]]; then
-    message "info" "- Setup the router"
+    message "info" "* Setup the router"
     router_properties "$(declare -p router_properties)"
     router_configure_acl "$router_acl_rules"
     router_configure_acl_drop_conn "$router_acl_drop_conn"

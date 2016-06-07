@@ -60,3 +60,13 @@ function ssh_add_match_option() {
 
   sed -i "s/^Match ${match_filter}.*/&\n\t${option}/" $ssh_config
 }
+
+function ssh_get_remote_file() {
+  local ssh_key_path="${1:?missing input}"
+  local remote_user="${2:?missing input}"
+  local remote_ip="${3:?missing input}"
+  local remote_file_path="${4:?missing input}"
+  local destination_file_path="${5:?missing input}"
+
+  ssh -i $ssh_key_path ${remote_user}@${remote_ip} sudo cat ${remote_file_path} > ${destination_file_path}
+}

@@ -38,13 +38,13 @@ resource "openstack_compute_secgroup_v2" "public" {
     from_port = 1
     to_port = 65535
     ip_protocol = "tcp"
-    cidr = "${openstack_networking_subnet_v2.public.cidr}"
+    cidr = "${openstack_networking_subnet_v2.main.cidr}"
   }
   rule {
     from_port = 1
     to_port = 65535
     ip_protocol = "udp"
-    cidr = "${openstack_networking_subnet_v2.public.cidr}"
+    cidr = "${openstack_networking_subnet_v2.main.cidr}"
   }
 }
 
@@ -83,18 +83,18 @@ resource "openstack_compute_secgroup_v2" "private" {
     from_port = 1
     to_port = 65535
     ip_protocol = "tcp"
-    cidr = "${openstack_networking_subnet_v2.public.cidr}"
+    cidr = "${openstack_networking_subnet_v2.main.cidr}"
   }
   rule {
     from_port = 1
     to_port = 65535
     ip_protocol = "udp"
-    cidr = "${openstack_networking_subnet_v2.public.cidr}"
+    cidr = "${openstack_networking_subnet_v2.main.cidr}"
   }
   rule {
     from_port = -1
     to_port = -1
     ip_protocol = "icmp"
-    cidr = "${openstack_networking_subnet_v2.public.cidr}"
+    cidr = "${openstack_networking_subnet_v2.main.cidr}"
   }
 }

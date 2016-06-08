@@ -1,5 +1,5 @@
 resource "openstack_compute_instance_v2" "core" {
-  depends_on = [ "openstack_networking_subnet_v2.public" ]
+  depends_on = [ "openstack_networking_subnet_v2.main" ]
   region = "${var.os_region_name}"
   # Amount of nodes
   # count = "${lookup(var.core, "count")}"
@@ -14,26 +14,13 @@ resource "openstack_compute_instance_v2" "core" {
     uuid="${openstack_networking_network_v2.main.id}"
     name="${openstack_networking_network_v2.main.name}"
   }
-  # floating_ip = "${element(openstack_compute_floatingip_v2.floatips.*.address, count.index)}"
-  floating_ip = "${openstack_compute_floatingip_v2.floatips.address}"
-  scheduler_hints { build_near_host_ip="${openstack_networking_subnet_v2.public.cidr}" }
+  floating_ip = "${openstack_compute_floatingip_v2.floatips_core.address}"
+  scheduler_hints { build_near_host_ip="${openstack_networking_subnet_v2.main.cidr}" }
   user_data = "${template_file.core.rendered}"
-
-  # Setup the provisioner connection with the Core node
-  connection {
-      user = "stackato"
-      password = "${var.core_password}"
-  }
-
-  # Copies the myapp.conf file to /etc/myapp.conf
-  provisioner "file" {
-    source = "stackato-automation"
-    destination = "/opt/"
-  }
 }
 
 resource "openstack_compute_instance_v2" "dea" {
-  depends_on = [ "openstack_networking_subnet_v2.public" ]
+  depends_on = [ "openstack_networking_subnet_v2.main" ]
   region = "${var.os_region_name}"
   # Amount of nodes
   count = "${lookup(var.dea, "count")}"
@@ -47,13 +34,12 @@ resource "openstack_compute_instance_v2" "dea" {
     uuid="${openstack_networking_network_v2.main.id}"
     name="${openstack_networking_network_v2.main.name}"
   }
-  # scheduler_hints { build_near_host_ip="${openstack_networking_subnet_v2.private.cidr}" }
-  scheduler_hints { build_near_host_ip="${openstack_networking_subnet_v2.public.cidr}" }
+  scheduler_hints { build_near_host_ip="${openstack_networking_subnet_v2.main.cidr}" }
   user_data = "${template_file.dea.rendered}"
 }
 
 resource "openstack_compute_instance_v2" "dataservices" {
-  depends_on = [ "openstack_networking_subnet_v2.public" ]
+  depends_on = [ "openstack_networking_subnet_v2.main" ]
   region = "${var.os_region_name}"
   # Amount of nodes
   count = "${lookup(var.dataservices, "count")}"
@@ -67,13 +53,12 @@ resource "openstack_compute_instance_v2" "dataservices" {
     uuid="${openstack_networking_network_v2.main.id}"
     name="${openstack_networking_network_v2.main.name}"
   }
-  # scheduler_hints { build_near_host_ip="${openstack_networking_subnet_v2.private.cidr}" }
-  scheduler_hints { build_near_host_ip="${openstack_networking_subnet_v2.public.cidr}" }
+  scheduler_hints { build_near_host_ip="${openstack_networking_subnet_v2.main.cidr}" }
   user_data = "${template_file.dataservices.rendered}"
 }
 
 resource "openstack_compute_instance_v2" "controller" {
-  depends_on = [ "openstack_networking_subnet_v2.public" ]
+  depends_on = [ "openstack_networking_subnet_v2.main" ]
   region = "${var.os_region_name}"
   # Amount of nodes
   count = "${lookup(var.controller, "count")}"
@@ -87,13 +72,12 @@ resource "openstack_compute_instance_v2" "controller" {
     uuid="${openstack_networking_network_v2.main.id}"
     name="${openstack_networking_network_v2.main.name}"
   }
-  # scheduler_hints { build_near_host_ip="${openstack_networking_subnet_v2.private.cidr}" }
-  scheduler_hints { build_near_host_ip="${openstack_networking_subnet_v2.public.cidr}" }
+  scheduler_hints { build_near_host_ip="${openstack_networking_subnet_v2.main.cidr}" }
   user_data = "${template_file.controller.rendered}"
 }
 
 resource "openstack_compute_instance_v2" "router" {
-  depends_on = [ "openstack_networking_subnet_v2.public" ]
+  depends_on = [ "openstack_networking_subnet_v2.main" ]
   region = "${var.os_region_name}"
   # Amount of nodes
   count = "${lookup(var.router, "count")}"
@@ -107,8 +91,7 @@ resource "openstack_compute_instance_v2" "router" {
     uuid="${openstack_networking_network_v2.main.id}"
     name="${openstack_networking_network_v2.main.name}"
   }
-  # scheduler_hints { build_near_host_ip="${openstack_networking_subnet_v2.private.cidr}" }
   floating_ip = "${element(openstack_compute_floatingip_v2.floatips_routers.*.address, count.index)}"
-  scheduler_hints { build_near_host_ip="${openstack_networking_subnet_v2.public.cidr}" }
+  scheduler_hints { build_near_host_ip="${openstack_networking_subnet_v2.main.cidr}" }
   user_data = "${template_file.router.rendered}"
 }

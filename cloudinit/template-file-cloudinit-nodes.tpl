@@ -13,10 +13,10 @@ bootcmd:
   # Increase the Redis start script timeout
   - sed -i "s/timeout 90/timeout 300/" /home/stackato/stackato/etc/firstboot/tasks/05-wait-for-config-redis.sh
   # Waiting for the APT Cacher
-  - bash -c 'while ! nc -z ${apt_proxy} ${apt_http_proxy_port}; do echo Waiting for APT Cacher on ${apt_proxy}; sleep 5; done'
+  - bash -c 'while ! nc -z $(echo ${apt_http_proxy} | sed "s/http[s]\?:\/\///" | tr ":" " "); do echo Waiting for APT Cacher on $(echo ${apt_http_proxy} | sed "s/http[s]\?:\/\///" |tr ":" " "); sleep 5; done'
 
-apt_proxy: http://${apt_proxy}:${apt_http_proxy_port}
-apt_https_proxy: http://${http_proxy}:${https_proxy_port}
+apt_proxy: ${apt_http_proxy}
+apt_https_proxy: ${apt_https_proxy}
 packages:
   - sshpass
 
@@ -25,5 +25,5 @@ runcmd:
  - sshpass -p${provisioner_repo_password} rsync -a ${provisioner_repo_user}@${provisioner_repo_ip}:${provisioner_repo_path}/ ${provisioner_repo_path}
  - chown -R root:root ${provisioner_repo_path}
  - chmod u+x ${provisioner_repo_path}/configure-node.sh
- - ${provisioner_repo_path}/configure-node.sh --core-ip "${core_ip}" --core-password "${core_password}" --cluster-hostname "${cluster_hostname}" --roles "${roles}" ${use_proxy_opt} --http-proxy "${http_proxy}" --http-proxy-port "${http_proxy_port}" --https-proxy-port "${https_proxy_port}" --apt-proxy "${apt_proxy}" --apt-http-proxy-port "${apt_http_proxy_port}" --apt-https-proxy-port "${apt_https_proxy_port}"
+ - ${provisioner_repo_path}/configure-node.sh --core-ip "${core_ip}" --core-password "${core_password}" --cluster-hostname "${cluster_hostname}" --roles "${roles}" ${use_proxy_opt} --http-proxy "${http_proxy}" --https-proxy "${https_proxy}" --apt-http-proxy "${apt_http_proxy}" --apt-https-proxy "${apt_https_proxy}"
  - cp /opt/stackato.conf /etc/init/stackato.conf

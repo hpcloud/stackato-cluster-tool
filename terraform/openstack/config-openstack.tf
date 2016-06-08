@@ -28,9 +28,15 @@ variable ssh_key_name {
   default = "stefan-win-key"
 }
 
+variable ssh_key_path {
+  description = "Path of the private key linked to ssh_key_name (used for uploading scripts)"
+  default= "~/.ssh/id_rsa"
+}
+
 variable openstack_flavor_name {
   description = "OpenStack flavor ID for each node type"
   default = {
+    proxy = "standard.large"
     core = "standard.large"
     dea = "standard.large"
     dataservices = "standard.large"
@@ -39,8 +45,9 @@ variable openstack_flavor_name {
   }
 }
 
-# To get the value, run the neutron cli command on an existing configured router:
-# neutron router-show ROUTER_NAME
+# To get the value, run the openstack cli commands on an existing configured router:
+# openstack router list
+# openstack router show ROUTER_NAME
 variable external_gateway_uuid {
   description = "The UUID of the external gateway that the router will connect to reach internal"
   default = "7da74520-9d5e-427b-a508-213c84e69616"

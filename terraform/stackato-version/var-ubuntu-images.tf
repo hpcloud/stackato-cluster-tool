@@ -12,3 +12,12 @@ variable "amazon_ubuntu_images" {
     sa-east-1	      = "ami-990887f5" # Sao Paulo
   }
 }
+
+# Get the list of images with the command:
+# openstack image list
+variable "openstack_ubuntu_images" {
+  description = "OpenStack images of Ubuntu 14.04 LTS"
+  default = {
+    region1        = "3233ef28-deb8-468a-a193-c848d4011d9d"
+  }
+}

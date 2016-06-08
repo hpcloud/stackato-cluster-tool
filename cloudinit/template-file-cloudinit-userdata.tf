@@ -13,6 +13,8 @@ resource "template_file" "proxy" {
       https_proxy_port          = "${lookup(var.proxy, "https_proxy_port")}"
       apt_http_proxy_port       = "${lookup(var.proxy, "apt_http_proxy_port")}"
       apt_https_proxy_port      = "${lookup(var.proxy, "apt_https_proxy_port")}"
+      http_upstream_proxy       = "${lookup(var.proxy, "http_upstream_proxy")}"
+      apt_upstream_proxy        = "${lookup(var.proxy, "apt_upstream_proxy")}"
       internal_network          = "${null_resource.network.triggers.cidr_block}"
 
       ephemeral_port_from       = "${var.ephemeral_port_from}"
@@ -25,18 +27,16 @@ resource "template_file" "core" {
   template = "${file("template-file-cloudinit-nodes.tpl")}"
 
   vars {
-      provisioner_repo_ip       = "${null_resource.proxy.triggers.private_ip}"
+      provisioner_repo_ip       = "${null_resource.provisioner_repo.triggers.private_ip}"
       provisioner_repo_user     = "${lookup(var.provisioner_repo, "user")}"
       provisioner_repo_password = "${lookup(var.provisioner_repo, "password")}"
       provisioner_repo_path     = "${lookup(var.provisioner_repo, "location")}"
 
       use_proxy_opt        = "${replace(lookup(var.proxy, "use_proxy"), "true", "--use-proxy")}"
-      http_proxy           = "${null_resource.proxy.triggers.private_ip}"
-      http_proxy_port      = "${lookup(var.proxy, "http_proxy_port")}"
-      https_proxy_port     = "${lookup(var.proxy, "https_proxy_port")}"
-      apt_proxy            = "${null_resource.proxy.triggers.apt_proxy}"
-      apt_http_proxy_port  = "${lookup(var.proxy, "apt_http_proxy_port")}"
-      apt_https_proxy_port = "${lookup(var.proxy, "apt_https_proxy_port")}"
+      http_proxy           = "${null_resource.proxy.triggers.http_proxy}"
+      https_proxy          = "${null_resource.proxy.triggers.https_proxy}"
+      apt_http_proxy       = "${null_resource.proxy.triggers.apt_http_proxy}"
+      apt_https_proxy      = "${null_resource.proxy.triggers.apt_https_proxy}"
 
       core_ip          = "127.0.0.1"
       cluster_hostname = "${var.cluster_hostname}"
@@ -50,18 +50,16 @@ resource "template_file" "dea" {
   template = "${file("template-file-cloudinit-nodes.tpl")}"
 
   vars {
-      provisioner_repo_ip       = "${null_resource.proxy.triggers.private_ip}"
+      provisioner_repo_ip       = "${null_resource.provisioner_repo.triggers.private_ip}"
       provisioner_repo_user     = "${lookup(var.provisioner_repo, "user")}"
       provisioner_repo_password = "${lookup(var.provisioner_repo, "password")}"
       provisioner_repo_path     = "${lookup(var.provisioner_repo, "location")}"
 
       use_proxy_opt        = "${replace(lookup(var.proxy, "use_proxy"), "true", "--use-proxy")}"
-      http_proxy           = "${null_resource.proxy.triggers.private_ip}"
-      http_proxy_port      = "${lookup(var.proxy, "http_proxy_port")}"
-      https_proxy_port     = "${lookup(var.proxy, "https_proxy_port")}"
-      apt_proxy            = "${null_resource.proxy.triggers.apt_proxy}"
-      apt_http_proxy_port  = "${lookup(var.proxy, "apt_http_proxy_port")}"
-      apt_https_proxy_port = "${lookup(var.proxy, "apt_https_proxy_port")}"
+      http_proxy           = "${null_resource.proxy.triggers.http_proxy}"
+      https_proxy          = "${null_resource.proxy.triggers.https_proxy}"
+      apt_http_proxy       = "${null_resource.proxy.triggers.apt_http_proxy}"
+      apt_https_proxy      = "${null_resource.proxy.triggers.apt_https_proxy}"
 
       core_ip          = "${null_resource.core.triggers.private_ip}"
       cluster_hostname = "${var.cluster_hostname}"
@@ -75,18 +73,16 @@ resource "template_file" "dataservices" {
   template = "${file("template-file-cloudinit-nodes.tpl")}"
 
   vars {
-      provisioner_repo_ip       = "${null_resource.proxy.triggers.private_ip}"
+      provisioner_repo_ip       = "${null_resource.provisioner_repo.triggers.private_ip}"
       provisioner_repo_user     = "${lookup(var.provisioner_repo, "user")}"
       provisioner_repo_password = "${lookup(var.provisioner_repo, "password")}"
       provisioner_repo_path     = "${lookup(var.provisioner_repo, "location")}"
 
       use_proxy_opt        = "${replace(lookup(var.proxy, "use_proxy"), "true", "--use-proxy")}"
-      http_proxy           = "${null_resource.proxy.triggers.private_ip}"
-      http_proxy_port      = "${lookup(var.proxy, "http_proxy_port")}"
-      https_proxy_port     = "${lookup(var.proxy, "https_proxy_port")}"
-      apt_proxy            = "${null_resource.proxy.triggers.apt_proxy}"
-      apt_http_proxy_port  = "${lookup(var.proxy, "apt_http_proxy_port")}"
-      apt_https_proxy_port = "${lookup(var.proxy, "apt_https_proxy_port")}"
+      http_proxy           = "${null_resource.proxy.triggers.http_proxy}"
+      https_proxy          = "${null_resource.proxy.triggers.https_proxy}"
+      apt_http_proxy       = "${null_resource.proxy.triggers.apt_http_proxy}"
+      apt_https_proxy      = "${null_resource.proxy.triggers.apt_https_proxy}"
 
       core_ip          = "${null_resource.core.triggers.private_ip}"
       cluster_hostname = "${var.cluster_hostname}"
@@ -100,18 +96,16 @@ resource "template_file" "controller" {
   template = "${file("template-file-cloudinit-nodes.tpl")}"
 
   vars {
-      provisioner_repo_ip       = "${null_resource.proxy.triggers.private_ip}"
+      provisioner_repo_ip       = "${null_resource.provisioner_repo.triggers.private_ip}"
       provisioner_repo_user     = "${lookup(var.provisioner_repo, "user")}"
       provisioner_repo_password = "${lookup(var.provisioner_repo, "password")}"
       provisioner_repo_path     = "${lookup(var.provisioner_repo, "location")}"
 
       use_proxy_opt        = "${replace(lookup(var.proxy, "use_proxy"), "true", "--use-proxy")}"
-      http_proxy           = "${null_resource.proxy.triggers.private_ip}"
-      http_proxy_port      = "${lookup(var.proxy, "http_proxy_port")}"
-      https_proxy_port     = "${lookup(var.proxy, "https_proxy_port")}"
-      apt_proxy            = "${null_resource.proxy.triggers.apt_proxy}"
-      apt_http_proxy_port  = "${lookup(var.proxy, "apt_http_proxy_port")}"
-      apt_https_proxy_port = "${lookup(var.proxy, "apt_https_proxy_port")}"
+      http_proxy           = "${null_resource.proxy.triggers.http_proxy}"
+      https_proxy          = "${null_resource.proxy.triggers.https_proxy}"
+      apt_http_proxy       = "${null_resource.proxy.triggers.apt_http_proxy}"
+      apt_https_proxy      = "${null_resource.proxy.triggers.apt_https_proxy}"
 
       core_ip          = "${null_resource.core.triggers.private_ip}"
       cluster_hostname = "${var.cluster_hostname}"
@@ -125,18 +119,16 @@ resource "template_file" "router" {
   template = "${file("template-file-cloudinit-nodes.tpl")}"
 
   vars {
-      provisioner_repo_ip       = "${null_resource.proxy.triggers.private_ip}"
+      provisioner_repo_ip       = "${null_resource.provisioner_repo.triggers.private_ip}"
       provisioner_repo_user     = "${lookup(var.provisioner_repo, "user")}"
       provisioner_repo_password = "${lookup(var.provisioner_repo, "password")}"
       provisioner_repo_path     = "${lookup(var.provisioner_repo, "location")}"
 
       use_proxy_opt        = "${replace(lookup(var.proxy, "use_proxy"), "true", "--use-proxy")}"
-      http_proxy           = "${null_resource.proxy.triggers.private_ip}"
-      http_proxy_port      = "${lookup(var.proxy, "http_proxy_port")}"
-      https_proxy_port     = "${lookup(var.proxy, "https_proxy_port")}"
-      apt_proxy            = "${null_resource.proxy.triggers.apt_proxy}"
-      apt_http_proxy_port  = "${lookup(var.proxy, "apt_http_proxy_port")}"
-      apt_https_proxy_port = "${lookup(var.proxy, "apt_https_proxy_port")}"
+      http_proxy           = "${null_resource.proxy.triggers.http_proxy}"
+      https_proxy          = "${null_resource.proxy.triggers.https_proxy}"
+      apt_http_proxy       = "${null_resource.proxy.triggers.apt_http_proxy}"
+      apt_https_proxy      = "${null_resource.proxy.triggers.apt_https_proxy}"
 
       core_ip          = "${null_resource.core.triggers.private_ip}"
       cluster_hostname = "${var.cluster_hostname}"

@@ -6,12 +6,13 @@ resource "openstack_networking_network_v2" "main" {
 }
 
 # Create a public subnet to host public facing nodes
-resource "openstack_networking_subnet_v2" "public" {
+resource "openstack_networking_subnet_v2" "main" {
   name = "${var.cluster_name}-subnet-public"
   region = "${var.os_region_name}"
   network_id = "${openstack_networking_network_v2.main.id}"
   cidr = "10.0.1.0/24"
   enable_dhcp = true
+  # dns_nameservers = [ "1.2.3.4", "1.2.3.5" ] # Add your static DNS servers
 }
 
 # Create a private subnet to host private hosts
@@ -35,11 +36,11 @@ resource "openstack_networking_router_v2" "router" {
 resource "openstack_networking_router_interface_v2" "router_interface_1" {
   region = "${var.os_region_name}"
   router_id = "${openstack_networking_router_v2.router.id}"
-  subnet_id = "${openstack_networking_subnet_v2.public.id}"
+  subnet_id = "${openstack_networking_subnet_v2.main.id}"
 }
 
-# Create floating IPs for public facing nodes
-resource "openstack_compute_floatingip_v2" "floatips" {
+# Create floating IPs for the public facing core node
+resource "openstack_compute_floatingip_v2" "floatips_core" {
   #count = "${lookup(var.core, "count")}"
   region = "${var.os_region_name}"
   pool = "${var.floating_ip_pool_name}"
@@ -48,6 +49,12 @@ resource "openstack_compute_floatingip_v2" "floatips" {
 # Create floating IPs for Stackato Routers
 resource "openstack_compute_floatingip_v2" "floatips_routers" {
   count = "${lookup(var.router, "count")}"
+  region = "${var.os_region_name}"
+  pool = "${var.floating_ip_pool_name}"
+}
+
+# Create floating IPs for the public facing proxy node
+resource "openstack_compute_floatingip_v2" "floatips_proxy" {
   region = "${var.os_region_name}"
   pool = "${var.floating_ip_pool_name}"
 }

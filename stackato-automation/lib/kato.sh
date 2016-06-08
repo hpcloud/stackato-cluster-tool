@@ -53,10 +53,9 @@ function kato_role_restart() {
 }
 
 function kato_set_upstream_proxy() {
-  local proxy_ip="${1:?undefined input}"
-  local proxy_port="${2:?undefined input}"
+  local http_proxy="${1:?undefined input}"
 
-  run_as "stackato" "$KATO_BIN op upstream_proxy set ${proxy_ip}:${proxy_port}"
+  run_as "stackato" "$KATO_BIN op upstream_proxy set ${http_proxy}"
   service_mgnt "polipo" "restart"
 }
 

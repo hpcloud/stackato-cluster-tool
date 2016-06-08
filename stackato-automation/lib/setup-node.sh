@@ -147,9 +147,11 @@ function setup_node() {
     "$cc_shared_dir" "$cc_shared_dir_ip" "$cc_shared_dir_user" "$cc_shared_dir_password"
 
   if [ "${roles#core}" == "${roles}" ]; then
+    message "info" "> Waiting for the MBUS server before attaching the node"
+    mbus_wait_ready "$mbus_ip" "$mbus_port"
     message "info" "> Pre-attachment setup"
     roles_pre_attach_setup "$core_ip" "$core_user" "$roles"
-    message "info" "> Attach node"
+    message "info" "> Attaching the node to the core node on $core_ip"
     node_attach "$core_ip" "$roles" "$mbus_ip" "$mbus_port"
   fi
 
@@ -269,10 +271,6 @@ function node_attach() {
   local mbus_ip="${3:?missing input}"
   local mbus_port="${4:?missing input}"
 
-  message "info" "> Waiting for MBUS before attaching the node"
-  mbus_wait_ready "$mbus_ip" "$mbus_port"
-
-  message "info" "> Attaching the node to the core node on $core_ip"
   kato_node_attach "$core_ip" "$roles"
 }
 

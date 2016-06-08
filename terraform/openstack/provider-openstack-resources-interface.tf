@@ -11,10 +11,10 @@ resource "null_resource" "core" {
 # Dynamic variables about the proxy
 resource "null_resource" "proxy" {
  triggers = {
-   http_proxy      = "${coalesce(lookup(var.proxy, "http_proxy"),      openstack_compute_instance_v2.proxy.network.0.fixed_ip_v4)}"
-   https_proxy     = "${coalesce(lookup(var.proxy, "https_proxy"),     openstack_compute_instance_v2.proxy.network.0.fixed_ip_v4)}"
-   apt_http_proxy  = "${coalesce(lookup(var.proxy, "apt_http_proxy"),  openstack_compute_instance_v2.proxy.network.0.fixed_ip_v4)}"
-   apt_https_proxy = "${coalesce(lookup(var.proxy, "apt_https_proxy"), openstack_compute_instance_v2.proxy.network.0.fixed_ip_v4)}"
+   http_proxy      = "${coalesce(lookup(var.proxy, "http_proxy"),      format("http://%s:%s" , openstack_compute_instance_v2.proxy.network.0.fixed_ip_v4, lookup(var.proxy, "http_proxy_port")))}"
+   https_proxy     = "${coalesce(lookup(var.proxy, "https_proxy"),     format("https://%s:%s", openstack_compute_instance_v2.proxy.network.0.fixed_ip_v4, lookup(var.proxy, "https_proxy_port")))}"
+   apt_http_proxy  = "${coalesce(lookup(var.proxy, "apt_http_proxy"),  format("http://%s:%s" , openstack_compute_instance_v2.proxy.network.0.fixed_ip_v4, lookup(var.proxy, "apt_http_proxy_port")))}"
+   apt_https_proxy = "${coalesce(lookup(var.proxy, "apt_https_proxy"), format("https://%s:%s", openstack_compute_instance_v2.proxy.network.0.fixed_ip_v4, lookup(var.proxy, "apt_https_proxy_port")))}"
  }
 }
 

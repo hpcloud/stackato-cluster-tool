@@ -33,6 +33,7 @@ variable ssh_key_path {
   default= "~/.ssh/id_rsa"
 }
 
+# To get the list of flavors, run the command: openstack flavor list
 variable openstack_flavor_name {
   description = "OpenStack flavor ID for each node type"
   default = {
@@ -48,11 +49,13 @@ variable openstack_flavor_name {
 # To get the value, run the openstack cli commands on an existing configured router:
 # openstack router list
 # openstack router show ROUTER_NAME
+# The external_gateway_uuid is the network_id at the external_gateway_info line
 variable external_gateway_uuid {
   description = "The UUID of the external gateway that the router will connect to reach internal"
   default = "7da74520-9d5e-427b-a508-213c84e69616"
 }
 
+# To get the floating IP pool name, run the command: openstack ip floating pool list
 variable floating_ip_pool_name {
   description = "The name of the floating IPs pool that will be used to attach to public facing nodes"
   default = "Ext-Net"

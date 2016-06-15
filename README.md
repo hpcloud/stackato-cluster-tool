@@ -44,6 +44,7 @@ Create the initial configuration:
 cd out
 ```
 
+- Export your OpenStack environment variables to connect and authenticate with your OpenStack cluster.
 - Edit config.tf to configure and name your cluster.
 - Edit config-openstack.tf to configure your Openstack particulars.
 - If you need to setup static DNS servers, comment out and setup the line "dns_nameservers" in the file provider-openstack-network.tf

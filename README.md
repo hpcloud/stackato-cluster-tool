@@ -11,6 +11,7 @@
 
 1. Terraform
 2. Valid Account and keys for your cloud provider
+3. A DNS server to translate \*.your-endpoint.com into your load balancer or core node IP
 
 ##### 1. Install Terraform
 https://terraform.io/downloads.html
@@ -31,8 +32,9 @@ Create the initial configuration:
 cd out
 ```
 
+- Authenticate by exporting the environment variables `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` or by configuring the `provider "aws"` block in the file provider-amazon-instances.tf. You can find more details about this block at https://www.terraform.io/docs/providers/aws/index.html.
 - Edit config.tf to configure and name your cluster.
-- Edit config-amazon.tf to configure your Amazon AWS particulars such as your access and ssh keys, spot or on-demand instances, as well as regions.
+- Edit config-amazon.tf to configure your Amazon AWS particulars such as ssh keys, spot or on-demand instances, as well as regions.
 - If using the load balancer option, your ssl certificate and key should be in the `out` folder and the keys `certificate_path` and `private_key_path` must be updated in `config.tf`.
 
 ###### 2.2. OpenStack

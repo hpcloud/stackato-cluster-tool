@@ -20,7 +20,7 @@ https://terraform.io/downloads.html
 _Check out the latest stable release:_
 
 ```
-git checkout v0.9.0
+git checkout v0.9.1
 ```
 
 

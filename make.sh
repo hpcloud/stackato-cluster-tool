@@ -3,7 +3,7 @@ set -e # Exit on error
 
 # Constants
 CWD="$(cd $(dirname $0) && pwd)"        # Script directory
-PLATFORM_SUPPORT=(openstack amazon-aws) # Supported platforms by this tool
+PLATFORM_SUPPORT=(openstack amazon-aws vsphere) # Supported platforms by this tool
 
 # Default configuration
 PLATFORM_DEFAULT="openstack"

@@ -51,7 +51,7 @@ variable vsphere_node_cpu {
     dataservices = "2"
     controller = "2"
     router = "2"
-    prioxy = "2"
+    proxy = "2"
   }
 }
 

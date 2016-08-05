@@ -1,8 +1,34 @@
+# It will generate cloudinit user data for each instance type
+# and upload the user data iso file to vSphere datastore 
+# location: cluster/${var.cluster_name}-cloudinit
+
 # Configure the VMware vSphere Provider
+
+variable "vsphere_server" {
+   description =  "vSphere server to target"
+   default     =  "vcenter.stackato.com"
+}
+
+
 provider "vsphere" {
   user           = "stefanb"
-  password       = "yourpassword"
+  password       = ""
   vsphere_server = "vcenter.yourdomain.com"
+}
+
+variable ssh_key_path {
+  description = "Path of the private key linked to ssh_key_name (used for uploading scripts)"
+  default= "~/.ssh/id_rsa"
+}
+
+variable "datacenter" {
+   description = "VSphere datacenter to target"
+   default = "AS DataCenter"
+}
+
+variable "datastore" {
+   description = "VSphere datastore to target"
+   default = "datastore1 (2)"
 }
 
 variable vsphere_node_memory {
@@ -13,6 +39,7 @@ variable vsphere_node_memory {
     dataservices = "4096"
     controller = "4096"
     router = "4096"
+    proxy = "4096"
   }
 }
 
@@ -24,6 +51,7 @@ variable vsphere_node_cpu {
     dataservices = "2"
     controller = "2"
     router = "2"
+    prioxy = "2"
   }
 }
 
@@ -35,5 +63,6 @@ variable vsphere_node_disk {
     dataservices = "40"
     controller = "20"
     router = "20"
+    proxy = "20"
   }
 }

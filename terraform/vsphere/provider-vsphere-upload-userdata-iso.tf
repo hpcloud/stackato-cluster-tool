@@ -9,9 +9,9 @@ resource "vsphere_file" "core_userdata" {
 
 #for uploading proxy user data as an iso image
 
-resource "vsphere_file" "proxy-userdata" {
+resource "vsphere_file" "proxy_userdata" {
   datacenter             = "${var.datacenter}"
   datastore              = "${var.datastore}"
   source_file            = "${var.cluster_name}-${var.userdata_iso_proxy_dir}.iso}"
   destination_file       = "/cluster/${var.cluster_name}-cloudinit/"
-
+}

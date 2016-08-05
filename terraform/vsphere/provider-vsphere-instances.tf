@@ -2,7 +2,7 @@
 resource "vsphere_virtual_machine" "core" {
   name   = "${var.cluster_name}-core"
   folder = "${var.cluster_name}"
-  vcpu   = "${lookup(var.vsphere_core_config, "core")}"
+  vcpu   = "${lookup(var.vsphere_node_cpu, "core")}"
   memory = "${lookup(var.vsphere_node_memory, "core")}"
 
   network_interface {
@@ -10,7 +10,7 @@ resource "vsphere_virtual_machine" "core" {
   }
 
   disk {
-    template = "${lookup(var.vsphere_templates, var.vsphere.vsphere_server)}"
+    template = "${lookup(var.vsphere_templates, var.vsphere_server)}"
     size = "${lookup(var.vsphere_node_disk, "core")}"
     datastore = "${var.datastore}"
   }
